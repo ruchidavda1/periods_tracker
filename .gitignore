@@ -34,8 +34,7 @@ Thumbs.db
 # TypeScript
 *.tsbuildinfo
 
-# Replit
-.replit
+# Replit (only ignore these)
 .replitignore
 replit.nix
 .upm/

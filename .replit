@@ -1,0 +1,27 @@
+run = "npm install && npm run build && npm start"
+entrypoint = "backend/src/index.ts"
+
+[nix]
+channel = "stable-22_11"
+
+[deployment]
+run = ["sh", "-c", "npm install && npm run build && npm start"]
+deploymentTarget = "cloudrun"
+build = ["sh", "-c", "npm install && npm run build"]
+
+[languages.typescript]
+pattern = "**/{*.ts,*.js,*.tsx,*.jsx}"
+
+[languages.typescript.languageServer]
+start = "typescript-language-server --stdio"
+
+[env]
+NODE_ENV = "production"
+
+[[ports]]
+localPort = 3000
+externalPort = 3000
+
+[[ports]]
+localPort = 5173
+externalPort = 80
