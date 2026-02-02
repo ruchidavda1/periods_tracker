@@ -20,12 +20,21 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-app.get('/health', (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    message: 'Period Tracker API (Sequelize + PostgreSQL) is running',
-    timestamp: new Date().toISOString(),
-  });
+app.get('/health', async (req: Request, res: Response) => {
+  try {
+    await sequelize.authenticate();
+    res.json({
+      status: 'ok',
+      database: 'connected',
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: 'error',
+      database: 'disconnected',
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 app.use('/api/auth', authRoutes);

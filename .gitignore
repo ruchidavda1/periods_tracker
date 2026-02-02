@@ -7,6 +7,10 @@ package-lock.json
 .env.local
 .env.*.local
 
+# Production env files (contain deployment URLs)
+frontend/.env.production
+backend/.env.production
+
 # Build outputs
 dist/
 build/
@@ -29,3 +33,11 @@ Thumbs.db
 
 # TypeScript
 *.tsbuildinfo
+
+# Replit
+.replit
+.replitignore
+replit.nix
+.upm/
+.cache/
+.config/
