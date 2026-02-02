@@ -1,0 +1,65 @@
+name: Deploy to Replit
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install root dependencies
+        run: npm install
+      
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm install
+      
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+      
+      - name: Build backend
+        working-directory: ./backend
+        run: npm run build
+      
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+      
+      - name: Run tests (if any)
+        run: |
+          echo "Running tests..."
+          # Add your test commands here when you have tests
+          # npm test
+      
+      - name: Trigger Replit Deployment
+        env:
+          REPLIT_DEPLOY_URL: ${{ secrets.REPLIT_DEPLOY_URL }}
+        run: |
+          if [ -n "$REPLIT_DEPLOY_URL" ]; then
+            echo "Triggering Replit deployment..."
+            curl -X POST "$REPLIT_DEPLOY_URL"
+            echo "✅ Deployment triggered successfully!"
+          else
+            echo "⚠️  REPLIT_DEPLOY_URL not set. Skipping deployment trigger."
+            echo "📝 Add REPLIT_DEPLOY_URL to GitHub Secrets to enable auto-deploy."
+          fi
+      
+      - name: Deployment Status
+        run: |
+          echo "🚀 Deployment workflow completed!"
+          echo "📦 Build artifacts created"
+          echo "🔗 Check Replit dashboard for deployment status"

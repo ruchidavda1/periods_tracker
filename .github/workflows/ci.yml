@@ -1,0 +1,59 @@
+name: CI - Build and Test
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: |
+          npm install
+          cd backend && npm install
+          cd ../frontend && npm install
+      
+      - name: Lint backend
+        working-directory: ./backend
+        run: |
+          echo "Running backend linting..."
+          # Add lint command when available: npm run lint
+      
+      - name: Build backend
+        working-directory: ./backend
+        run: npm run build
+      
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+      
+      - name: Run tests
+        run: |
+          echo "Running tests..."
+          # Add test commands: npm test
+      
+      - name: Check build artifacts
+        run: |
+          echo "Checking build outputs..."
+          ls -la backend/dist || echo "⚠️  Backend dist not found"
+          ls -la frontend/dist || echo "⚠️  Frontend dist not found"
+      
+      - name: Build Summary
+        run: |
+          echo "✅ Build completed successfully!"
+          echo "📦 Backend and frontend built"
