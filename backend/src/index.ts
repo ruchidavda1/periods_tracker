@@ -1,0 +1,73 @@
+import express, { Request, Response, NextFunction } from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { sequelize } from './models';
+import authRoutes from './routes/auth';
+import periodRoutes from './routes/periods';
+import predictionRoutes from './routes/predictions';
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
+
+app.get('/health', (req: Request, res: Response) => {
+  res.json({
+    success: true,
+    message: 'Period Tracker API (Sequelize + PostgreSQL) is running',
+    timestamp: new Date().toISOString(),
+  });
+});
+
+app.use('/api/auth', authRoutes);
+app.use('/api/periods', periodRoutes);
+app.use('/api/predictions', predictionRoutes);
+
+app.use((req: Request, res: Response) => {
+  res.status(404).json({
+    success: false,
+    error: 'Route not found',
+  });
+});
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error('Error:', err);
+  res.status(500).json({
+    success: false,
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? err.message : undefined,
+  });
+});
+
+const startServer = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('✅ Database connection established successfully.');
+    
+    await sequelize.sync();
+    console.log('✅ All models synchronized.');
+    
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`📊 Health check: http://localhost:${PORT}/health`);
+      console.log(`🗄️  ORM: Sequelize + PostgreSQL`);
+    });
+  } catch (error) {
+    console.error('❌ Unable to connect to database:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
+
+export default app;
+

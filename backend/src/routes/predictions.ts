@@ -1,0 +1,71 @@
+import { Router, Request, Response, NextFunction } from 'express';
+import { predictionService } from '../services/predictionService';
+import { authMiddleware } from '../middleware/auth';
+
+const router = Router();
+router.use(authMiddleware);
+
+router.get('/next-period', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user!.id;
+    const prediction = await predictionService.predictNextPeriod(userId);
+    
+    res.json({
+      success: true,
+      data: {
+        next_period: {
+          predicted_start_date: prediction.predictedStartDate.toISOString().split('T')[0],
+          predicted_end_date: prediction.predictedEndDate.toISOString().split('T')[0],
+          confidence_score: prediction.confidenceScore,
+        },
+        ovulation: {
+          predicted_start_date: prediction.ovulationStart.toISOString().split('T')[0],
+          predicted_end_date: prediction.ovulationEnd.toISOString().split('T')[0],
+        },
+        cycle_stats: {
+          avg_cycle_length: Math.round(prediction.cycleStats.avgCycleLength),
+          avg_period_length: Math.round(prediction.cycleStats.avgPeriodLength),
+          cycle_regularity: prediction.cycleStats.regularity,
+          cycles_tracked: prediction.cycleStats.cyclesTracked,
+          standard_deviation: prediction.cycleStats.standardDeviation.toFixed(2),
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/calendar', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user!.id;
+    const months = parseInt(req.query.months as string) || 3;
+    const numberOfCycles = Math.min(months, 6);
+    
+    const result = await predictionService.predictMultipleCycles(userId, numberOfCycles);
+    
+    res.json({
+      success: true,
+      data: {
+        predictions: result.predictions.map(p => ({
+          cycle_number: p.cycleNumber,
+          predicted_start_date: p.predictedStartDate.toISOString().split('T')[0],
+          predicted_end_date: p.predictedEndDate.toISOString().split('T')[0],
+          ovulation_start: p.ovulationStart.toISOString().split('T')[0],
+          ovulation_end: p.ovulationEnd.toISOString().split('T')[0],
+          confidence_score: p.confidenceScore,
+        })),
+        cycle_stats: {
+          avg_cycle_length: Math.round(result.cycleStats.avgCycleLength),
+          avg_period_length: Math.round(result.cycleStats.avgPeriodLength),
+          cycle_regularity: result.cycleStats.regularity,
+          cycles_tracked: result.cycleStats.cyclesTracked,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+export default router;

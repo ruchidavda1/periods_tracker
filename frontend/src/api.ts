@@ -1,0 +1,118 @@
+import axios from 'axios';
+
+const API_BASE_URL = 'http://localhost:3000/api';
+
+// Create axios instance with default config
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add token to requests if available
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Auth API
+export const authAPI = {
+  login: async (email: string, password: string) => {
+    const response = await api.post('/auth/login', { email, password });
+    return response.data;
+  },
+  
+  register: async (email: string, password: string) => {
+    const response = await api.post('/auth/register', { email, password });
+    return response.data;
+  },
+};
+
+// Period API
+export interface Period {
+  id: string;
+  start_date: string;
+  end_date: string | null;
+  flow_intensity: 'light' | 'moderate' | 'heavy' | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export const periodAPI = {
+  getAll: async (): Promise<{ periods: Period[] }> => {
+    const response = await api.get('/periods');
+    return response.data.data;
+  },
+  
+  create: async (data: {
+    start_date: string;
+    end_date?: string;
+    flow_intensity?: 'light' | 'moderate' | 'heavy';
+    notes?: string;
+  }) => {
+    const response = await api.post('/periods', data);
+    return response.data;
+  },
+  
+  update: async (id: string, data: {
+    start_date?: string;
+    end_date?: string;
+    flow_intensity?: 'light' | 'moderate' | 'heavy';
+    notes?: string;
+  }) => {
+    const response = await api.put(`/periods/${id}`, data);
+    return response.data;
+  },
+  
+  delete: async (id: string) => {
+    const response = await api.delete(`/periods/${id}`);
+    return response.data;
+  },
+};
+
+// Prediction API
+export interface Prediction {
+  next_period: {
+    predicted_start_date: string;
+    predicted_end_date: string;
+    confidence_score: number;
+  };
+  ovulation: {
+    predicted_start_date: string;
+    predicted_end_date: string;
+  };
+  cycle_stats: {
+    avg_cycle_length: number;
+    avg_period_length: number;
+    cycle_regularity: string;
+    cycles_tracked: number;
+    standard_deviation: string;
+  };
+}
+
+export interface CalendarPrediction {
+  cycle_number: number;
+  predicted_start_date: string;
+  predicted_end_date: string;
+  ovulation_start: string;
+  ovulation_end: string;
+  confidence_score: number;
+}
+
+export const predictionAPI = {
+  getNextPeriod: async (): Promise<Prediction> => {
+    const response = await api.get('/predictions/next-period');
+    return response.data.data;
+  },
+  
+  getCalendar: async (months: number = 3) => {
+    const response = await api.get(`/predictions/calendar?months=${months}`);
+    return response.data.data;
+  },
+};
+
+export default api;
