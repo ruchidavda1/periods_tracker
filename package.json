@@ -9,7 +9,7 @@
     "build:frontend": "cd frontend && npm run build",
     "build": "npm run install:all && npm run build:backend && npm run build:frontend",
     "start:backend": "cd backend && npm start",
-    "start:frontend": "cd frontend && npm run preview -- --host 0.0.0.0 --port 5173",
+    "start:frontend": "cd frontend && npm run preview -- --host 0.0.0.0 --port 5000",
     "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",

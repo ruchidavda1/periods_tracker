@@ -79,12 +79,7 @@ On every `git push` to `main` branch:
 
 ## Architecture
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed architecture documentation including:
-- High-Level Design (HLD)
-- Low-Level Design (LLD)
-- Database Schema
-- API Specifications
-- Scalability Considerations
+For detailed architecture, database schema, API specifications, and prediction algorithm documentation, see [Documentation.md](./Documentation.md).
 
 ## Scaling to 1M+ Users
 
@@ -427,11 +422,11 @@ npm install
 npm run dev
 ```
 
-The frontend will run on `http://localhost:5173`
+The frontend will run on `http://localhost:5000`
 
 ### 5. Access the Application
 
-1. Open your browser and navigate to `http://localhost:5173`
+1. Open your browser and navigate to `http://localhost:5000`
 2. Create a new account by clicking "Sign Up"
 3. Login with your credentials
 
