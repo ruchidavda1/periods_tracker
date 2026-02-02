@@ -2,6 +2,36 @@
 
 A comprehensive period tracking application with intelligent prediction algorithms built with TypeScript, Node.js, React, and PostgreSQL.
 
+## Live Demo
+
+The application is deployed and accessible at:
+
+- **Frontend**: [https://periods-tracker-xi.vercel.app](https://periods-tracker-xi.vercel.app)
+- **Backend API**: [https://round-judy-abcdefghiw-b8b6fbce.koyeb.app](https://round-judy-abcdefghiw-b8b6fbce.koyeb.app)
+
+### Deployment Stack
+- **Frontend**: Deployed on [Vercel](https://vercel.com) (Free Tier)
+- **Backend**: Deployed on [Koyeb](https://koyeb.com) (Free Tier)
+- **Database**: [Neon](https://neon.tech) - Serverless PostgreSQL (Free Tier)
+- **CI/CD**: GitHub Actions with auto-deployment enabled
+
+### Auto-Deployment Flow
+
+On every `git push` to `main` branch:
+
+1. **GitHub Actions runs CI checks** (`.github/workflows/ci.yml`)
+   - Backend TypeScript type checking & build verification
+   - Frontend TypeScript type checking & build verification
+
+2. **Vercel auto-deploys Frontend** (if CI passes)
+   - Automatic deployment via Vercel-GitHub integration
+   - Preview deployments for pull requests
+   - Production deployment for `main` branch
+
+3. **Koyeb auto-deploys Backend** (if CI passes)
+   - Automatic deployment via Koyeb-GitHub integration
+   - Builds Docker image from `backend/Dockerfile`
+
 ## Table of Contents
 
 - [Features](#features)
