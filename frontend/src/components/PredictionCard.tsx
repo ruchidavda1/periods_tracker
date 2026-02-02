@@ -38,7 +38,7 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Next Period Card */}
-        <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl p-6 border border-primary-200">
+        <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl p-6 border border-primary-200 transform transition-all duration-300 hover:scale-105 hover:shadow-xl cursor-pointer">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-primary-800">Next Period</h3>
             <span className="text-sm font-medium text-primary-600 bg-white px-3 py-1 rounded-full">
@@ -70,7 +70,7 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
         </div>
 
         {/* Ovulation Window Card */}
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200 transform transition-all duration-300 hover:scale-105 hover:shadow-xl cursor-pointer">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-purple-800">Fertile Window</h3>
             <span className="text-xs text-purple-600 bg-white px-2 py-1 rounded-full">
