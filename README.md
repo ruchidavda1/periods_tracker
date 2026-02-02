@@ -439,10 +439,6 @@ cd backend
 npm run dev
 ```
 
-## License
-
-This is a demo project created for educational purposes.
-
 ## Getting Started
 
 1. Sign up with your email and password (minimum 8 characters)
