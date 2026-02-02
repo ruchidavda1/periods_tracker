@@ -20,6 +20,9 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
+
   // Populate form when editing
   useEffect(() => {
     if (editingPeriod) {
@@ -77,6 +80,7 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
+              max={today}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 bg-white [color-scheme:light]"
               required
             />
@@ -91,6 +95,7 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               min={startDate}
+              max={today}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 bg-white [color-scheme:light]"
             />
           </div>
