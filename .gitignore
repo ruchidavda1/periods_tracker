@@ -8,7 +8,7 @@ package-lock.json
 .env.*.local
 
 # Production env files (contain deployment URLs)
-frontend/.env.production
+frontend/.env.production.local
 backend/.env.production
 
 # Build outputs
@@ -34,9 +34,6 @@ Thumbs.db
 # TypeScript
 *.tsbuildinfo
 
-# Replit (only ignore these)
-.replitignore
-replit.nix
-.upm/
-.cache/
-.config/
+# Vercel
+.vercel
+.vercel/
