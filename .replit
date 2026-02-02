@@ -5,7 +5,8 @@ entrypoint = "backend/src/index.ts"
 channel = "stable-22_11"
 
 [deployment]
-run = ["sh", "-c", "npm run build && npm start"]
+build = ["sh", "-c", "npm run build"]
+run = ["sh", "-c", "npm start"]
 deploymentTarget = "gce"
 ignorePorts = false
 
