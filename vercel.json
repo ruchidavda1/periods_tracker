@@ -3,6 +3,5 @@
   "buildCommand": "npm install --prefix frontend && cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
   "installCommand": null,
-  "framework": null,
-  "ignoreCommand": "echo 'Skipping build checks'"
+  "framework": null
 }
