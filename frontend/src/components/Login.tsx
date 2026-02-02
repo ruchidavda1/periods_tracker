@@ -102,20 +102,6 @@ export default function Login({ onAuth }: LoginProps) {
           </button>
         </div>
 
-        {!isSignup && (
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-900 font-medium mb-2">Quick Demo:</p>
-            <button
-              onClick={fillDemoCredentials}
-              className="text-xs text-blue-700 hover:text-blue-900 underline"
-            >
-              Fill demo credentials (demo@example.com)
-            </button>
-            <p className="text-xs text-gray-600 mt-2">
-              Note: Create this account via Sign Up first, or use your own email
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
