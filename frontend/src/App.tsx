@@ -13,7 +13,6 @@ function App() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingPeriod, setEditingPeriod] = useState<Period | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isSignupMode, setIsSignupMode] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
