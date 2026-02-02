@@ -2,7 +2,7 @@
 
 A comprehensive period tracking application with intelligent prediction algorithms built with TypeScript, Node.js, React, and PostgreSQL.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
@@ -12,7 +12,7 @@ A comprehensive period tracking application with intelligent prediction algorith
 - [Prediction Algorithm](#prediction-algorithm)
 - [Project Structure](#project-structure)
 
-## ✨ Features
+## Features
 
 ### Core Features
 - **Period Logging**: Track start/end dates and flow intensity
@@ -29,13 +29,13 @@ A comprehensive period tracking application with intelligent prediction algorith
 - Handles irregular cycles gracefully
 - Minimum 3 cycles required for accurate predictions
 
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Backend
 - **Runtime**: Node.js with TypeScript
 - **Framework**: Express.js
 - **Database**: PostgreSQL
-- **ORM**: Prisma
+- **ORM**: Sequelize
 - **Validation**: Zod
 - **Authentication**: JWT with bcrypt
 
@@ -46,7 +46,7 @@ A comprehensive period tracking application with intelligent prediction algorith
 - **HTTP Client**: Axios
 - **State Management**: React Hooks
 
-## 🏗 Architecture
+## Architecture
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed architecture documentation including:
 - High-Level Design (HLD)
@@ -55,7 +55,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed architecture documentation
 - API Specifications
 - Scalability Considerations
 
-## 🚀 Setup Instructions
+## Setup Instructions
 
 ### Prerequisites
 
@@ -115,17 +115,12 @@ npm install
 cp .env.example .env
 
 # Edit .env file with your database credentials
-# DATABASE_URL="postgresql://postgres:password@localhost:5432/period_tracker?schema=public"
+# DB_USER=ruchidavda
+# DB_PASSWORD=
+# DB_NAME=period_tracker
+# DB_HOST=localhost
+# DB_PORT=5432
 # JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
-
-# Generate Prisma Client
-npm run prisma:generate
-
-# Run database migrations
-npm run prisma:migrate
-
-# Seed database with demo data
-npm run prisma:seed
 
 # Start backend server
 npm run dev
@@ -152,11 +147,10 @@ The frontend will run on `http://localhost:5173`
 ### 5. Access the Application
 
 1. Open your browser and navigate to `http://localhost:5173`
-2. Login with demo credentials:
-   - **Email**: demo@example.com
-   - **Password**: password123
+2. Create a new account by clicking "Sign Up"
+3. Login with your credentials
 
-## 📚 API Documentation
+## API Documentation
 
 ### Base URL
 ```
@@ -241,7 +235,7 @@ Response:
 
 **GET /api/predictions/calendar?months=3** - Get predictions for next N cycles
 
-## 🧮 Prediction Algorithm
+## Prediction Algorithm
 
 ### Overview
 
@@ -296,17 +290,23 @@ Key methods:
 - Unrealistic data: Filters cycle lengths outside 21-45 day range
 - Missing end dates: Excluded from calculations
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 period_tracker/
 ├── ARCHITECTURE.md          # Detailed architecture documentation
 ├── README.md               # This file
 ├── backend/
-│   ├── prisma/
-│   │   ├── schema.prisma  # Database schema
-│   │   └── seed.ts        # Database seeding script
 │   ├── src/
+│   │   ├── config/
+│   │   │   └── database.ts # Sequelize configuration
+│   │   ├── models/
+│   │   │   ├── User.ts    # User model
+│   │   │   ├── UserSettings.ts
+│   │   │   ├── Period.ts  # Period model
+│   │   │   ├── Symptom.ts
+│   │   │   ├── Prediction.ts
+│   │   │   └── index.ts   # Model exports
 │   │   ├── middleware/
 │   │   │   └── auth.ts    # JWT authentication middleware
 │   │   ├── routes/
@@ -335,7 +335,7 @@ period_tracker/
     └── vite.config.ts
 ```
 
-## 🧪 Testing the Application
+## Testing the Application
 
 ### Test Prediction Algorithm
 
@@ -344,13 +344,14 @@ period_tracker/
 3. Add new periods to see how predictions update
 4. Check confidence scores based on cycle regularity
 
-### Demo Data
+### Adding Data
 
-The seeded database includes 7 periods over 6 months:
-- Start: August 2025
-- End: January 2026
-- Cycle lengths: 28-29 days (regular)
-- Period duration: 5-6 days
+Start by logging your periods:
+- Click "+ Log Period" button
+- Enter start date and end date
+- Select flow intensity
+- Add optional notes
+- Minimum 3 periods needed for predictions
 
 ### Testing Different Scenarios
 
@@ -366,16 +367,16 @@ The seeded database includes 7 periods over 6 months:
 - Delete periods until less than 3 remain
 - Observe default predictions with low confidence
 
-## 🔐 Security Features
+## Security Features
 
 - Password hashing with bcrypt (10 rounds)
 - JWT-based authentication
 - Protected API endpoints
 - Input validation with Zod
-- SQL injection prevention via Prisma ORM
+- SQL injection prevention via Sequelize ORM
 - CORS enabled for frontend-backend communication
 
-## 🚀 Future Enhancements
+## Future Enhancements
 
 ### Short-term
 - Symptom tracking and pattern analysis
@@ -390,7 +391,7 @@ The seeded database includes 7 periods over 6 months:
 - Multi-language support
 - Mobile app (React Native)
 
-## 📊 Scalability Considerations
+## Scalability Considerations
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed scalability strategies including:
 
@@ -401,7 +402,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed scalability strategies inc
 - Pre-computed predictions
 - CDN for static assets
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Database Connection Issues
 
@@ -427,26 +428,28 @@ kill -9 <PID>
 PORT=3001
 ```
 
-### Prisma Issues
+### Database Issues
 
 ```bash
-# Reset database
-npm run prisma:migrate reset
+# Check database connection
+psql -d period_tracker -U ruchidavda
 
-# Regenerate client
-npm run prisma:generate
+# Restart backend server
+cd backend
+npm run dev
 ```
 
-## 📝 License
+## License
 
 This is a demo project created for educational purposes.
 
-## 👥 Demo Credentials
+## Getting Started
 
-- **Email**: demo@example.com
-- **Password**: password123
+1. Sign up with your email and password (minimum 8 characters)
+2. Log your first period entry
+3. Add at least 3 periods to see accurate predictions
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Prediction algorithm inspired by research on menstrual cycle tracking
 - UI design influenced by popular health tracking apps
