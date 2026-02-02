@@ -32,11 +32,6 @@ export default function Login({ onAuth }: LoginProps) {
     setPassword('');
   };
 
-  const fillDemoCredentials = () => {
-    setEmail('demo@example.com');
-    setPassword('password123');
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
