@@ -120,8 +120,8 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
+    <div className="bg-white rounded-xl shadow-lg p-5">
+      <h2 className="text-xl font-bold text-gray-800 mb-4">
         {editingPeriod ? 'Edit Period' : 'Log New Period'}
       </h2>
 
@@ -136,7 +136,7 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               max={today}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 bg-white [color-scheme:light]"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 bg-white [color-scheme:light]"
               required
             />
           </div>
@@ -151,7 +151,7 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
               onChange={(e) => setEndDate(e.target.value)}
               min={startDate}
               max={today}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 bg-white [color-scheme:light]"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 bg-white [color-scheme:light]"
             />
           </div>
         </div>
@@ -164,10 +164,10 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
             <button
               type="button"
               onClick={() => setFlowIntensity('light')}
-              className={`py-3 px-4 rounded-lg border-2 transition-all font-medium ${
+              className={`py-2.5 px-4 rounded-lg border-2 transition-all font-medium ${
                 flowIntensity === 'light'
-                  ? 'border-blue-400 bg-blue-100 text-blue-800'
-                  : 'border-gray-300 hover:border-gray-400 bg-white text-gray-700'
+                  ? 'border-blue-400 bg-blue-100 text-blue-800 shadow-sm'
+                  : 'border-gray-300 hover:border-gray-400 bg-white text-gray-700 hover:shadow-sm'
               }`}
             >
               Light
@@ -175,10 +175,10 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
             <button
               type="button"
               onClick={() => setFlowIntensity('moderate')}
-              className={`py-3 px-4 rounded-lg border-2 transition-all font-medium ${
+              className={`py-2.5 px-4 rounded-lg border-2 transition-all font-medium ${
                 flowIntensity === 'moderate'
-                  ? 'border-yellow-400 bg-yellow-100 text-yellow-800'
-                  : 'border-gray-300 hover:border-gray-400 bg-white text-gray-700'
+                  ? 'border-yellow-400 bg-yellow-100 text-yellow-800 shadow-sm'
+                  : 'border-gray-300 hover:border-gray-400 bg-white text-gray-700 hover:shadow-sm'
               }`}
             >
               Moderate
@@ -186,10 +186,10 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
             <button
               type="button"
               onClick={() => setFlowIntensity('heavy')}
-              className={`py-3 px-4 rounded-lg border-2 transition-all font-medium ${
+              className={`py-2.5 px-4 rounded-lg border-2 transition-all font-medium ${
                 flowIntensity === 'heavy'
-                  ? 'border-red-400 bg-red-100 text-red-800'
-                  : 'border-gray-300 hover:border-gray-400 bg-white text-gray-700'
+                  ? 'border-red-400 bg-red-100 text-red-800 shadow-sm'
+                  : 'border-gray-300 hover:border-gray-400 bg-white text-gray-700 hover:shadow-sm'
               }`}
             >
               Heavy
@@ -204,39 +204,39 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400"
-            rows={3}
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400"
+            rows={2}
             placeholder="Any observations or general notes..."
           />
         </div>
 
         {/* Symptom Tracker */}
-        <div className="space-y-4 pt-2">
+        <div className="space-y-3 pt-2">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Symptoms (optional)
           </label>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
             {SYMPTOM_OPTIONS.map((symptom) => (
               <button
                 key={symptom.type}
                 type="button"
                 onClick={() => toggleSymptom(symptom.type)}
-                className={`p-3 rounded-lg border-2 transition-all font-medium text-sm flex flex-col items-center gap-1 ${
+                className={`p-2.5 rounded-lg border-2 transition-all font-medium text-sm flex flex-col items-center gap-1 ${
                   selectedSymptoms[symptom.type]
-                    ? 'border-primary-500 bg-primary-50 text-primary-800'
-                    : 'border-gray-300 hover:border-gray-400 bg-white text-gray-700'
+                    ? 'border-primary-500 bg-primary-50 text-primary-800 shadow-sm'
+                    : 'border-gray-300 hover:border-gray-400 bg-white text-gray-700 hover:shadow-sm'
                 }`}
               >
-                <span className="text-2xl">{symptom.icon}</span>
-                <span>{symptom.label}</span>
+                <span className="text-xl">{symptom.icon}</span>
+                <span className="text-xs">{symptom.label}</span>
               </button>
             ))}
           </div>
 
           {/* Severity Sliders for Selected Symptoms */}
           {Object.keys(selectedSymptoms).length > 0 && (
-            <div className="mt-4 space-y-4 p-4 bg-gray-50 rounded-lg">
+            <div className="mt-3 space-y-3 p-4 bg-gray-50 rounded-lg">
               <h4 className="text-sm font-semibold text-gray-700">Severity & Notes</h4>
               
               {Object.entries(selectedSymptoms).map(([symptomType, data]) => {
@@ -281,18 +281,18 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
           </div>
         )}
 
-        <div className="flex gap-3 pt-4">
+        <div className="flex gap-3 pt-3">
           <button
             type="submit"
             disabled={isLoading}
-            className="flex-1 bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            className="flex-1 bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-primary-600 hover:to-primary-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
           >
             {isLoading ? 'Saving...' : (editingPeriod ? 'Update Period' : 'Save Period')}
           </button>
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all"
           >
             Cancel
           </button>

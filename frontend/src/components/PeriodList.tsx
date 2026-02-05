@@ -76,10 +76,10 @@ export default function PeriodList({ periods, onDelete, onEdit, editingPeriod, o
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Period History</h2>
+    <div className="bg-white rounded-xl shadow-lg p-5">
+      <h2 className="text-xl font-bold text-gray-800 mb-4">Period History</h2>
       
-      <div className="space-y-4">
+      <div className="space-y-3">
         {periods.map((period) => (
           <div key={period.id}>
             {/* Period Card */}
@@ -88,40 +88,40 @@ export default function PeriodList({ periods, onDelete, onEdit, editingPeriod, o
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-4 mb-3">
                     <div className="flex-1">
-                      <p className="text-sm text-gray-600">Start Date</p>
-                      <p className="text-lg font-semibold text-gray-800">
+                      <p className="text-xs text-gray-600">Start Date</p>
+                      <p className="text-base font-semibold text-gray-800">
                         {formatDate(period.start_date)}
                       </p>
                     </div>
                     
                     {period.end_date && (
                       <div className="flex-1">
-                        <p className="text-sm text-gray-600">End Date</p>
-                        <p className="text-lg font-semibold text-gray-800">
+                        <p className="text-xs text-gray-600">End Date</p>
+                        <p className="text-base font-semibold text-gray-800">
                           {formatDate(period.end_date)}
                         </p>
                       </div>
                     )}
                     
                     <div className="flex-1">
-                      <p className="text-sm text-gray-600">Duration</p>
-                      <p className="text-lg font-semibold text-gray-800">
+                      <p className="text-xs text-gray-600">Duration</p>
+                      <p className="text-base font-semibold text-gray-800">
                         {calculateDuration(period.start_date, period.end_date)}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 mt-3 flex-wrap">
+                  <div className="flex items-center gap-2 flex-wrap">
                     {period.flow_intensity && (
-                      <span className={`text-xs font-semibold px-3 py-1 rounded-full ${getFlowColor(period.flow_intensity)}`}>
+                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${getFlowColor(period.flow_intensity)}`}>
                         {period.flow_intensity} flow
                       </span>
                     )}
                     
                     {period.notes && (
-                      <span className="text-sm text-gray-600 italic">
+                      <span className="text-xs text-gray-600 italic">
                         "{period.notes}"
                       </span>
                     )}
@@ -135,7 +135,7 @@ export default function PeriodList({ periods, onDelete, onEdit, editingPeriod, o
                         {(period as PeriodWithSymptoms).symptoms!.map((symptom) => (
                           <span
                             key={symptom.id}
-                            className="inline-flex items-center gap-1 text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded-full border border-purple-200"
+                            className="inline-flex items-center gap-1 text-xs bg-purple-50 text-purple-700 px-2.5 py-1 rounded-full border border-purple-200"
                             title={symptom.notes || ''}
                           >
                             <span>{getSymptomIcon(symptom.symptom_type)}</span>
@@ -173,12 +173,12 @@ export default function PeriodList({ periods, onDelete, onEdit, editingPeriod, o
 
             {/* Edit Form - appears right below the period being edited */}
             {editingPeriod?.id === period.id && (
-              <div className="mt-4 mb-4 p-6 bg-blue-50 rounded-xl border-2 border-blue-300 shadow-lg">
-                <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-blue-300">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="mt-4 mb-4 p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-400 shadow-xl">
+                <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-blue-400">
+                  <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
-                  <h3 className="text-lg font-bold text-blue-800">Edit Period</h3>
+                  <h3 className="text-lg font-bold text-blue-900">Edit Period</h3>
                 </div>
                 <AddPeriodForm 
                   onSubmit={onSubmitEdit}
