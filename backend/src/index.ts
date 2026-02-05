@@ -5,6 +5,7 @@ import { sequelize } from './models';
 import authRoutes from './routes/auth';
 import periodRoutes from './routes/periods';
 import predictionRoutes from './routes/predictions';
+import symptomRoutes from './routes/symptoms';
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.get('/health', async (req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/periods', periodRoutes);
 app.use('/api/predictions', predictionRoutes);
+app.use('/api/symptoms', symptomRoutes);
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({

@@ -82,6 +82,7 @@ export interface Prediction {
     predicted_start_date: string;
     predicted_end_date: string;
     confidence_score: number;
+    predicted_flow_intensity: 'light' | 'moderate' | 'heavy' | null;
   };
   ovulation: {
     predicted_start_date: string;
@@ -114,6 +115,52 @@ export const predictionAPI = {
   getCalendar: async (months: number = 3) => {
     const response = await api.get(`/predictions/calendar?months=${months}`);
     return response.data.data;
+  },
+};
+
+// Symptom API
+export type SymptomType = 'cramps' | 'headache' | 'mood_swings' | 'fatigue' | 'bloating' | 'acne' | 'other';
+
+export interface Symptom {
+  id: string;
+  period_id: string;
+  date: string;
+  symptom_type: SymptomType;
+  severity: number;
+  notes: string | null;
+}
+
+export interface SymptomPattern {
+  symptom_type: string;
+  frequency: number;
+  avg_severity: number;
+  occurrences: number;
+}
+
+export const symptomAPI = {
+  create: async (periodId: string, data: {
+    date: string;
+    symptom_type: SymptomType;
+    severity: number;
+    notes?: string;
+  }) => {
+    const response = await api.post(`/periods/${periodId}/symptoms`, data);
+    return response.data;
+  },
+
+  getByPeriod: async (periodId: string): Promise<Symptom[]> => {
+    const response = await api.get(`/periods/${periodId}/symptoms`);
+    return response.data.data;
+  },
+
+  getPatterns: async (): Promise<{ patterns: SymptomPattern[]; total_periods: number }> => {
+    const response = await api.get('/symptoms/patterns');
+    return response.data.data;
+  },
+
+  delete: async (id: string) => {
+    const response = await api.delete(`/symptoms/${id}`);
+    return response.data;
   },
 };
 

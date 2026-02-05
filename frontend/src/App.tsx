@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { periodAPI, predictionAPI, authAPI, Period, Prediction } from './api';
+import { periodAPI, predictionAPI, authAPI, symptomAPI, Period, Prediction } from './api';
 import Login from './components/Login';
 import PeriodList from './components/PeriodList';
 import PredictionCard from './components/PredictionCard';
 import AddPeriodForm from './components/AddPeriodForm';
+import SymptomInsights from './components/SymptomInsights';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -13,6 +14,8 @@ function App() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingPeriod, setEditingPeriod] = useState<Period | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showPeriodHistory, setShowPeriodHistory] = useState(false);
+  const [showSymptomInsights, setShowSymptomInsights] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -30,8 +33,12 @@ function App() {
       setIsLoading(true);
       const [periodsData, predictionData] = await Promise.all([
         periodAPI.getAll(),
-        predictionAPI.getNextPeriod().catch(() => null), // Prediction might fail if not enough data
+        predictionAPI.getNextPeriod().catch((err) => {
+          console.error('Prediction error:', err);
+          return null;
+        }), // Prediction might fail if not enough data
       ]);
+      console.log('Loaded data:', { periodsData, predictionData });
       setPeriods(periodsData.periods);
       setPrediction(predictionData);
       setError(null);
@@ -69,15 +76,39 @@ function App() {
     end_date?: string;
     flow_intensity?: 'light' | 'moderate' | 'heavy';
     notes?: string;
+    symptoms?: Array<{
+      symptom_type: string;
+      severity: number;
+      notes?: string;
+    }>;
   }) => {
     try {
+      let periodId: string;
+      
       if (editingPeriod) {
         // Update existing period
         await periodAPI.update(editingPeriod.id, data);
+        periodId = editingPeriod.id;
       } else {
         // Create new period
-        await periodAPI.create(data);
+        const result = await periodAPI.create(data);
+        periodId = result.data.id;
       }
+
+      // Add symptoms if any
+      if (data.symptoms && data.symptoms.length > 0 && periodId) {
+        await Promise.all(
+          data.symptoms.map(symptom =>
+            symptomAPI.create(periodId, {
+              date: data.start_date,
+              symptom_type: symptom.symptom_type as any,
+              severity: symptom.severity,
+              notes: symptom.notes,
+            })
+          )
+        );
+      }
+
       await loadData(); // Reload data after adding/updating
       setShowAddForm(false);
       setEditingPeriod(null);
@@ -88,7 +119,7 @@ function App() {
 
   const handleEditPeriod = (period: Period) => {
     setEditingPeriod(period);
-    setShowAddForm(true);
+    setShowAddForm(false); // Close the top form if it's open
   };
 
   const handleCancelEdit = () => {
@@ -179,22 +210,82 @@ function App() {
         </div>
 
         {/* Add/Edit Period Form */}
-        {showAddForm && (
+        {showAddForm && !editingPeriod && (
           <div className="mb-8">
             <AddPeriodForm 
               onSubmit={handleAddPeriod} 
               onCancel={handleCancelEdit}
-              editingPeriod={editingPeriod}
+              editingPeriod={null}
             />
           </div>
         )}
 
         {/* Period List */}
-        <PeriodList 
-          periods={periods} 
-          onDelete={handleDeletePeriod}
-          onEdit={handleEditPeriod}
-        />
+        <div className="mb-8">
+          <button
+            onClick={() => setShowPeriodHistory(!showPeriodHistory)}
+            className="w-full bg-white rounded-2xl shadow-lg p-4 hover:shadow-xl transition-all flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3">
+              <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <h2 className="text-xl font-bold text-gray-800">Period History ({periods.length})</h2>
+            </div>
+            <svg 
+              className={`w-6 h-6 text-gray-600 transition-transform ${showPeriodHistory ? 'rotate-180' : ''}`}
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {showPeriodHistory && (
+            <div className="mt-4">
+              <PeriodList 
+                periods={periods} 
+                onDelete={handleDeletePeriod}
+                onEdit={handleEditPeriod}
+                editingPeriod={editingPeriod}
+                onCancelEdit={handleCancelEdit}
+                onSubmitEdit={handleAddPeriod}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Symptom Insights - Moved to Bottom */}
+        {periods.length > 0 && (
+          <div className="mb-8">
+            <button
+              onClick={() => setShowSymptomInsights(!showSymptomInsights)}
+              className="w-full bg-white rounded-2xl shadow-lg p-4 hover:shadow-xl transition-all flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <h2 className="text-xl font-bold text-gray-800">Symptom Insights</h2>
+              </div>
+              <svg 
+                className={`w-6 h-6 text-gray-600 transition-transform ${showSymptomInsights ? 'rotate-180' : ''}`}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {showSymptomInsights && (
+              <div className="mt-4">
+                <SymptomInsights />
+              </div>
+            )}
+          </div>
+        )}
       </main>
     </div>
   );

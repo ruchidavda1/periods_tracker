@@ -17,6 +17,7 @@ router.get('/next-period', async (req: Request, res: Response, next: NextFunctio
           predicted_start_date: prediction.predictedStartDate.toISOString().split('T')[0],
           predicted_end_date: prediction.predictedEndDate.toISOString().split('T')[0],
           confidence_score: prediction.confidenceScore,
+          predicted_flow_intensity: prediction.predictedFlowIntensity,
         },
         ovulation: {
           predicted_start_date: prediction.ovulationStart.toISOString().split('T')[0],

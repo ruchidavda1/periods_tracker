@@ -10,6 +10,7 @@ class Prediction extends Model {
   declare ovulation_start: Date;
   declare ovulation_end: Date;
   declare confidence_score: number;
+  declare predicted_flow_intensity: 'light' | 'moderate' | 'heavy' | null;
   declare readonly created_at: Date;
 }
 
@@ -47,6 +48,10 @@ Prediction.init({
   confidence_score: {
     type: DataTypes.FLOAT,
     allowNull: false,
+  },
+  predicted_flow_intensity: {
+    type: DataTypes.ENUM('light', 'moderate', 'heavy'),
+    allowNull: true,
   },
 }, {
   sequelize,

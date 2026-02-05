@@ -13,6 +13,9 @@ The application is deployed and accessible at:
 - **Frontend**: Deployed on [Vercel](https://vercel.com) (Free Tier)
 - **Backend**: Deployed on [Koyeb](https://koyeb.com) (Free Tier)
 - **Database**: [Neon](https://neon.tech) - Serverless PostgreSQL (Free Tier)
+  - Serverless, auto-scaling PostgreSQL
+  - Connection pooling enabled
+  - SSL/TLS encryption by default
 - **CI/CD**: GitHub Actions with auto-deployment enabled
 
 ### Auto-Deployment Flow
@@ -340,20 +343,47 @@ For detailed architecture, database schema, API specifications, and prediction a
 ### Prerequisites
 
 - Node.js (v18 or higher)
-- PostgreSQL (v14 or higher)
 - npm or yarn
+- A Neon account (for PostgreSQL database) - [https://neon.tech](https://neon.tech)
 
 ### 1. Clone the Repository
 
 ```bash
+git clone <your-repo-url>
 cd period_tracker
 ```
 
-### 2. Database Setup
+### 2. Database Setup with Neon
 
-#### Install PostgreSQL (if not already installed)
+#### Option A: Use Neon (Recommended - Free Serverless PostgreSQL)
 
-**macOS (using Homebrew):**
+1. **Create a Neon Account**:
+   - Go to [https://neon.tech](https://neon.tech)
+   - Sign up for free
+
+2. **Create a New Project**:
+   - Click "New Project"
+   - Name: `period-tracker-db`
+   - Region: Choose closest to your users
+
+3. **Get Connection String**:
+   - Copy the connection string from the dashboard
+   - Format: `postgresql://[user]:[password]@[host]/[database]?sslmode=require`
+   - Example: `postgresql://neondb_owner:xxxxx@ep-xxx.aws.neon.tech/period-tracker-db?sslmode=require`
+
+4. **Update Backend Environment**:
+   ```bash
+   cd backend
+   cp .env.example .env
+   # Edit .env and add:
+   DATABASE_URL=your_neon_connection_string
+   ```
+
+#### Option B: Local PostgreSQL Setup
+
+#### Option B: Local PostgreSQL Setup
+
+**Install PostgreSQL:**
 ```bash
 brew install postgresql@14
 brew services start postgresql@14
@@ -391,15 +421,8 @@ cd backend
 # Install dependencies
 npm install
 
-# Create .env file
-cp .env.example .env
-
-# Edit .env file with your database credentials
-# DB_USER=ruchidavda
-# DB_PASSWORD=
-# DB_NAME=period_tracker
-# DB_HOST=localhost
-# DB_PORT=5432
+# .env file should already be configured from step 2
+# Make sure to add JWT_SECRET if not already there
 # JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
 
 # Start backend server

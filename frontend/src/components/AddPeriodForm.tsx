@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Period } from '../api';
+import { Period, SymptomType } from '../api';
 
 interface AddPeriodFormProps {
   onSubmit: (data: {
@@ -7,6 +7,11 @@ interface AddPeriodFormProps {
     end_date?: string;
     flow_intensity?: 'light' | 'moderate' | 'heavy';
     notes?: string;
+    symptoms?: Array<{
+      symptom_type: SymptomType;
+      severity: number;
+      notes?: string;
+    }>;
   }) => Promise<void>;
   onCancel: () => void;
   editingPeriod?: Period | null;
@@ -19,9 +24,22 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
   const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [selectedSymptoms, setSelectedSymptoms] = useState<{
+    [key: string]: { severity: number; notes: string };
+  }>({});
 
   // Get today's date in YYYY-MM-DD format
   const today = new Date().toISOString().split('T')[0];
+
+  const SYMPTOM_OPTIONS = [
+    { type: 'cramps' as SymptomType, label: 'Cramps', icon: '🩹' },
+    { type: 'headache' as SymptomType, label: 'Headache', icon: '🤕' },
+    { type: 'mood_swings' as SymptomType, label: 'Mood Swings', icon: '😢' },
+    { type: 'fatigue' as SymptomType, label: 'Fatigue', icon: '😴' },
+    { type: 'bloating' as SymptomType, label: 'Bloating', icon: '🎈' },
+    { type: 'acne' as SymptomType, label: 'Acne', icon: '🔴' },
+    { type: 'other' as SymptomType, label: 'Other', icon: '📝' },
+  ];
 
   // Populate form when editing
   useEffect(() => {
@@ -36,8 +54,36 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
       setEndDate('');
       setFlowIntensity('');
       setNotes('');
+      setSelectedSymptoms({});
     }
   }, [editingPeriod]);
+
+  const toggleSymptom = (symptomType: SymptomType) => {
+    if (selectedSymptoms[symptomType]) {
+      const updated = { ...selectedSymptoms };
+      delete updated[symptomType];
+      setSelectedSymptoms(updated);
+    } else {
+      setSelectedSymptoms({
+        ...selectedSymptoms,
+        [symptomType]: { severity: 3, notes: '' },
+      });
+    }
+  };
+
+  const updateSeverity = (symptomType: SymptomType, severity: number) => {
+    setSelectedSymptoms({
+      ...selectedSymptoms,
+      [symptomType]: { ...selectedSymptoms[symptomType], severity },
+    });
+  };
+
+  const updateSymptomNotes = (symptomType: SymptomType, symptomNotes: string) => {
+    setSelectedSymptoms({
+      ...selectedSymptoms,
+      [symptomType]: { ...selectedSymptoms[symptomType], notes: symptomNotes },
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,11 +91,19 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
     setIsLoading(true);
 
     try {
+      // Convert symptoms to array format
+      const symptoms = Object.entries(selectedSymptoms).map(([symptom_type, data]) => ({
+        symptom_type: symptom_type as SymptomType,
+        severity: data.severity,
+        notes: data.notes || undefined,
+      }));
+
       await onSubmit({
         start_date: startDate,
         end_date: endDate || undefined,
         flow_intensity: flowIntensity || undefined,
         notes: notes || undefined,
+        symptoms: symptoms.length > 0 ? symptoms : undefined,
       });
       
       // Reset form
@@ -57,6 +111,7 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
       setEndDate('');
       setFlowIntensity('');
       setNotes('');
+      setSelectedSymptoms({});
     } catch (err: any) {
       setError(err.message || 'Failed to add period');
     } finally {
@@ -151,8 +206,73 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
             onChange={(e) => setNotes(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400"
             rows={3}
-            placeholder="Any symptoms, observations, or notes..."
+            placeholder="Any observations or general notes..."
           />
+        </div>
+
+        {/* Symptom Tracker */}
+        <div className="space-y-4 pt-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Symptoms (optional)
+          </label>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {SYMPTOM_OPTIONS.map((symptom) => (
+              <button
+                key={symptom.type}
+                type="button"
+                onClick={() => toggleSymptom(symptom.type)}
+                className={`p-3 rounded-lg border-2 transition-all font-medium text-sm flex flex-col items-center gap-1 ${
+                  selectedSymptoms[symptom.type]
+                    ? 'border-primary-500 bg-primary-50 text-primary-800'
+                    : 'border-gray-300 hover:border-gray-400 bg-white text-gray-700'
+                }`}
+              >
+                <span className="text-2xl">{symptom.icon}</span>
+                <span>{symptom.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Severity Sliders for Selected Symptoms */}
+          {Object.keys(selectedSymptoms).length > 0 && (
+            <div className="mt-4 space-y-4 p-4 bg-gray-50 rounded-lg">
+              <h4 className="text-sm font-semibold text-gray-700">Severity & Notes</h4>
+              
+              {Object.entries(selectedSymptoms).map(([symptomType, data]) => {
+                const symptomInfo = SYMPTOM_OPTIONS.find(s => s.type === symptomType);
+                return (
+                  <div key={symptomType} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium text-gray-700">
+                        {symptomInfo?.icon} {symptomInfo?.label}
+                      </label>
+                      <span className="text-sm font-semibold text-primary-600">
+                        {data.severity}/5
+                      </span>
+                    </div>
+                    
+                    <input
+                      type="range"
+                      min="1"
+                      max="5"
+                      value={data.severity}
+                      onChange={(e) => updateSeverity(symptomType as SymptomType, parseInt(e.target.value))}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
+                    />
+                    
+                    <input
+                      type="text"
+                      value={data.notes}
+                      onChange={(e) => updateSymptomNotes(symptomType as SymptomType, e.target.value)}
+                      placeholder="Optional notes about this symptom..."
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-gray-900"
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {error && (

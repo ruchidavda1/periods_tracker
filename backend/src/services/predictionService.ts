@@ -17,6 +17,7 @@ interface PredictionResult {
   ovulationStart: Date;
   ovulationEnd: Date;
   confidenceScore: number;
+  predictedFlowIntensity: 'light' | 'moderate' | 'heavy' | null;
 }
 
 interface MultiplePredictions {
@@ -54,6 +55,7 @@ export class PredictionService {
       periods.length,
       cycleStats.avgCycleLength
     );
+    const predictedFlowIntensity = this.predictFlowIntensity(periods);
 
     await this.savePrediction(userId, {
       predictedStartDate,
@@ -61,6 +63,7 @@ export class PredictionService {
       ovulationStart,
       ovulationEnd,
       confidenceScore,
+      predictedFlowIntensity,
     });
 
     await this.updateUserSettings(userId, cycleStats);
@@ -71,8 +74,49 @@ export class PredictionService {
       ovulationStart,
       ovulationEnd,
       confidenceScore,
+      predictedFlowIntensity,
       cycleStats,
     };
+  }
+
+  private predictFlowIntensity(periods: any[]): 'light' | 'moderate' | 'heavy' | null {
+    // Get the last 6 periods with flow intensity data
+    const periodsWithFlow = periods
+      .filter(p => p.flow_intensity)
+      .slice(0, 6);
+
+    if (periodsWithFlow.length === 0) {
+      return null; // No data to predict from
+    }
+
+    // Count occurrences of each intensity
+    const intensityCounts = {
+      light: 0,
+      moderate: 0,
+      heavy: 0,
+    };
+
+    periodsWithFlow.forEach(period => {
+      if (period.flow_intensity) {
+        intensityCounts[period.flow_intensity as keyof typeof intensityCounts]++;
+      }
+    });
+
+    // Give more weight to recent periods
+    const recentPeriods = periodsWithFlow.slice(0, 3);
+    recentPeriods.forEach(period => {
+      if (period.flow_intensity) {
+        intensityCounts[period.flow_intensity as keyof typeof intensityCounts] += 0.5;
+      }
+    });
+
+    // Return the most common intensity
+    const maxCount = Math.max(...Object.values(intensityCounts));
+    const mostCommon = Object.entries(intensityCounts).find(
+      ([_, count]) => count === maxCount
+    );
+
+    return mostCommon ? (mostCommon[0] as 'light' | 'moderate' | 'heavy') : 'moderate';
   }
 
   async predictMultipleCycles(userId: string, numberOfCycles: number = 3): Promise<MultiplePredictions> {
@@ -104,6 +148,7 @@ export class PredictionService {
         ovulationStart,
         ovulationEnd,
         confidenceScore: Math.max(confidenceScore, 0.40),
+        predictedFlowIntensity: firstPrediction.predictedFlowIntensity,
       });
     }
 
@@ -206,6 +251,7 @@ export class PredictionService {
       ovulationStart,
       ovulationEnd,
       confidenceScore,
+      predictedFlowIntensity: null,
       cycleStats: {
         avgCycleLength,
         avgPeriodLength,
@@ -224,6 +270,7 @@ export class PredictionService {
       ovulation_start: prediction.ovulationStart,
       ovulation_end: prediction.ovulationEnd,
       confidence_score: prediction.confidenceScore,
+      predicted_flow_intensity: prediction.predictedFlowIntensity,
     });
   }
 
