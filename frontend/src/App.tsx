@@ -5,6 +5,8 @@ import PeriodList from './components/PeriodList';
 import PredictionCard from './components/PredictionCard';
 import AddPeriodForm from './components/AddPeriodForm';
 import SymptomInsights from './components/SymptomInsights';
+import CycleProgressBar from './components/CycleProgressBar';
+import CalendarHeatmap from './components/CalendarHeatmap';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -16,6 +18,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [showPeriodHistory, setShowPeriodHistory] = useState(false);
   const [showSymptomInsights, setShowSymptomInsights] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -193,11 +196,19 @@ function App() {
           </div>
         )}
 
+        {/* Cycle Progress Bar */}
+        {periods.length > 0 && (
+          <CycleProgressBar 
+            periods={periods} 
+            nextPeriodDate={prediction?.next_period.predicted_start_date || null}
+          />
+        )}
+
         {/* Prediction Card */}
         {prediction && <PredictionCard prediction={prediction} />}
 
         {/* Actions */}
-        <div className="mb-6">
+        <div className="mb-6 flex gap-3">
           <button
             onClick={() => {
               setShowAddForm(!showAddForm);
@@ -207,6 +218,18 @@ function App() {
           >
             {showAddForm ? 'Cancel' : '+ Log Period'}
           </button>
+          
+          {periods.length > 0 && (
+            <button
+              onClick={() => setShowCalendar(true)}
+              className="bg-white text-primary-600 px-6 py-3 rounded-lg hover:bg-primary-50 transition-colors shadow-md border-2 border-primary-600 flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              View Calendar
+            </button>
+          )}
         </div>
 
         {/* Add/Edit Period Form */}
@@ -287,6 +310,34 @@ function App() {
           </div>
         )}
       </main>
+
+      {/* Calendar Modal */}
+      {showCalendar && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowCalendar(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-2xl max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-2.5 flex items-center justify-between rounded-t-2xl">
+              <h2 className="text-base font-bold text-gray-800">Cycle Calendar</h2>
+              <button
+                onClick={() => setShowCalendar(false)}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-4">
+              <CalendarHeatmap periods={periods} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

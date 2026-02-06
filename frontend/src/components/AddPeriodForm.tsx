@@ -48,6 +48,19 @@ export default function AddPeriodForm({ onSubmit, onCancel, editingPeriod }: Add
       setEndDate(editingPeriod.end_date || '');
       setFlowIntensity(editingPeriod.flow_intensity || '');
       setNotes(editingPeriod.notes || '');
+      
+      // Load existing symptoms
+      const existingSymptoms: { [key: string]: { severity: number; notes: string } } = {};
+      const periodSymptoms = (editingPeriod as any).symptoms || [];
+      
+      periodSymptoms.forEach((symptom: any) => {
+        existingSymptoms[symptom.symptom_type] = {
+          severity: symptom.severity,
+          notes: symptom.notes || '',
+        };
+      });
+      
+      setSelectedSymptoms(existingSymptoms);
     } else {
       // Reset form when not editing
       setStartDate('');

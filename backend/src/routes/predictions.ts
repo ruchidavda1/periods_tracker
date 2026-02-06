@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { predictionService } from '../services/predictionService';
 import { authMiddleware } from '../middleware/auth';
+import { cacheHelpers } from '../config/redis';
 
 const router = Router();
 router.use(authMiddleware);
@@ -8,29 +9,47 @@ router.use(authMiddleware);
 router.get('/next-period', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user!.id;
+    
+    const cacheKey = `prediction:${userId}`;
+    const cachedPrediction = await cacheHelpers.get(cacheKey);
+    
+    if (cachedPrediction) {
+      return res.json({
+        success: true,
+        data: cachedPrediction,
+        cached: true,
+      });
+    }
+    
+    // If not in cache, calculate prediction
     const prediction = await predictionService.predictNextPeriod(userId);
+    
+    const responseData = {
+      next_period: {
+        predicted_start_date: prediction.predictedStartDate.toISOString().split('T')[0],
+        predicted_end_date: prediction.predictedEndDate.toISOString().split('T')[0],
+        confidence_score: prediction.confidenceScore,
+        predicted_flow_intensity: prediction.predictedFlowIntensity,
+      },
+      ovulation: {
+        predicted_start_date: prediction.ovulationStart.toISOString().split('T')[0],
+        predicted_end_date: prediction.ovulationEnd.toISOString().split('T')[0],
+      },
+      cycle_stats: {
+        avg_cycle_length: Math.round(prediction.cycleStats.avgCycleLength),
+        avg_period_length: Math.round(prediction.cycleStats.avgPeriodLength),
+        cycle_regularity: prediction.cycleStats.regularity,
+        cycles_tracked: prediction.cycleStats.cyclesTracked,
+        standard_deviation: prediction.cycleStats.standardDeviation.toFixed(2),
+      },
+    };
+    
+    await cacheHelpers.set(cacheKey, responseData, 3600);
     
     res.json({
       success: true,
-      data: {
-        next_period: {
-          predicted_start_date: prediction.predictedStartDate.toISOString().split('T')[0],
-          predicted_end_date: prediction.predictedEndDate.toISOString().split('T')[0],
-          confidence_score: prediction.confidenceScore,
-          predicted_flow_intensity: prediction.predictedFlowIntensity,
-        },
-        ovulation: {
-          predicted_start_date: prediction.ovulationStart.toISOString().split('T')[0],
-          predicted_end_date: prediction.ovulationEnd.toISOString().split('T')[0],
-        },
-        cycle_stats: {
-          avg_cycle_length: Math.round(prediction.cycleStats.avgCycleLength),
-          avg_period_length: Math.round(prediction.cycleStats.avgPeriodLength),
-          cycle_regularity: prediction.cycleStats.regularity,
-          cycles_tracked: prediction.cycleStats.cyclesTracked,
-          standard_deviation: prediction.cycleStats.standardDeviation.toFixed(2),
-        },
-      },
+      data: responseData,
+      cached: false,
     });
   } catch (error) {
     next(error);

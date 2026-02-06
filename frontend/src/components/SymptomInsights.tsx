@@ -101,9 +101,9 @@ export default function SymptomInsights() {
         {patterns.map((pattern) => (
           <div
             key={pattern.symptom_type}
-            className="border border-gray-200 rounded-xl p-4 hover:border-primary-300 hover:shadow-md transition-all"
+            className="border border-gray-200 rounded-xl p-5"
           >
-            <div className="flex items-start justify-between">
+            <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3 flex-1">
                 <div className="text-3xl">{getSymptomIcon(pattern.symptom_type)}</div>
                 <div className="flex-1">
@@ -131,13 +131,15 @@ export default function SymptomInsights() {
               </div>
             </div>
 
-            {/* Progress Bar for Frequency */}
+            {/* Visual Chart - Frequency Progress Bar */}
             <div className="mt-3">
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-primary-400 to-primary-600 h-2 rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-primary-400 to-primary-600 h-3 rounded-full transition-all duration-500 relative"
                   style={{ width: `${pattern.frequency}%` }}
-                ></div>
+                >
+                  <div className="absolute inset-0 bg-white opacity-20 animate-pulse"></div>
+                </div>
               </div>
             </div>
           </div>

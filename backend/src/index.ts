@@ -6,6 +6,8 @@ import authRoutes from './routes/auth';
 import periodRoutes from './routes/periods';
 import predictionRoutes from './routes/predictions';
 import symptomRoutes from './routes/symptoms';
+import { apiLimiter } from './middleware/rateLimiter';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 
 dotenv.config();
 
@@ -15,6 +17,9 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Apply rate limiting to all API routes
+app.use('/api/', apiLimiter);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
@@ -43,21 +48,11 @@ app.use('/api/periods', periodRoutes);
 app.use('/api/predictions', predictionRoutes);
 app.use('/api/symptoms', symptomRoutes);
 
-app.use((req: Request, res: Response) => {
-  res.status(404).json({
-    success: false,
-    error: 'Route not found',
-  });
-});
+// 404 handler
+app.use(notFoundHandler);
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error('Error:', err);
-  res.status(500).json({
-    success: false,
-    error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? err.message : undefined,
-  });
-});
+// Global error handler (must be last)
+app.use(errorHandler);
 
 const startServer = async () => {
   try {

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { authMiddleware } from '../middleware/auth';
 import { Period } from '../models';
 import Symptom, { SymptomType } from '../models/Symptom';
+import { cacheHelpers } from '../config/redis';
 
 const router = Router();
 router.use(authMiddleware);
@@ -40,6 +41,9 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
       flow_intensity: validatedData.flow_intensity as any,
       notes: validatedData.notes,
     });
+    
+    // Invalidate prediction cache when new period is added
+    await cacheHelpers.delete(`prediction:${userId}`);
     
     res.status(201).json({
       success: true,
