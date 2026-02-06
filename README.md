@@ -50,10 +50,10 @@ npm run test:coverage   # Generate coverage report
 ```
 
 **Test Coverage:**
-- ✅ Prediction algorithm (weighted average, std deviation, confidence)
-- ✅ Flow intensity prediction
-- ✅ Cycle regularity classification
-- ✅ Edge cases (empty data, single period, invalid values)
+- Prediction algorithm (weighted average, std deviation, confidence)
+- Flow intensity prediction
+- Cycle regularity classification
+- Edge cases (empty data, single period, invalid values)
 
 **Test Framework**: Jest + ts-jest
 
@@ -61,23 +61,23 @@ npm run test:coverage   # Generate coverage report
 
 ## Security Features
 
-- ✅ **Rate Limiting**: 100 requests per 15 minutes per IP
-- ✅ **JWT Authentication**: Stateless, 24h expiry
-- ✅ **Password Hashing**: bcrypt with 10 rounds
-- ✅ **Input Validation**: Zod schemas on backend
-- ✅ **SQL Injection Prevention**: Sequelize parameterized queries
-- ✅ **Error Handling**: Centralized error middleware
+- **Rate Limiting**: 100 requests per 15 minutes per IP
+- **JWT Authentication**: Stateless, 24h expiry
+- **Password Hashing**: bcrypt with 10 rounds
+- **Input Validation**: Zod schemas on backend
+- **SQL Injection Prevention**: Sequelize parameterized queries
+- **Error Handling**: Centralized error middleware
 
 ---
 
 ## Performance Optimizations
 
-- ✅ **Redis Caching**: 85% cache hit rate, 2ms response time
-- ✅ **Database Indexing**: B-tree indexes on foreign keys
-- ✅ **Query Optimization**: Eager loading, selective fields
-- ✅ **Connection Pooling**: Reuse database connections
-- ✅ **Pagination**: Limit queries to 10-50 records
-- ✅ **CDN**: Static assets served from edge locations
+- **Redis Caching**: 85% cache hit rate, 2ms response time
+- **Database Indexing**: B-tree indexes on foreign keys
+- **Query Optimization**: Eager loading, selective fields
+- **Connection Pooling**: Reuse database connections
+- **Pagination**: Limit queries to 10-50 records
+- **CDN**: Static assets served from edge locations
 
 See [QUERY_OPTIMIZATION.md](./QUERY_OPTIMIZATION.md) for detailed examples.
 
@@ -149,30 +149,30 @@ For detailed architecture, database schema, API specifications, and prediction a
 - **Single Database**: PostgreSQL on Neon (shared CPU, limited connections)
 - **Single Region**: Backend deployed in Frankfurt (EU), Frontend on Vercel Edge
 - **Monolithic Backend**: Single Node.js instance with limited horizontal scaling
-- ~~**No Caching**~~: ✅ **Redis caching implemented** (optional, graceful degradation)
+- ~~**No Caching**~~: **Redis caching implemented** (optional, graceful degradation)
 
 ### Scalability Strategy for 1M+ Users
 
 #### Phase 1: Immediate Optimizations (0-10K Users)
 **Infrastructure:**
-- ✅ **Upgrade Database**: Move to dedicated Neon instance or managed PostgreSQL (AWS RDS, GCP Cloud SQL)
-- ✅ **Connection Pooling**: Implement PgBouncer for efficient connection management
-- ✅ **CDN**: Leverage Vercel Edge Network for global frontend delivery (already enabled)
+- **Upgrade Database**: Move to dedicated Neon instance or managed PostgreSQL (AWS RDS, GCP Cloud SQL)
+- **Connection Pooling**: Implement PgBouncer for efficient connection management
+- **CDN**: Leverage Vercel Edge Network for global frontend delivery (already enabled)
 
 **Backend:**
-- ✅ **Redis Cache Implemented**: Cache predictions, cycle stats (85% hit rate, 2ms response time)
+- **Redis Cache Implemented**: Cache predictions, cycle stats (85% hit rate, 2ms response time)
   ```typescript
   // Cache predictions for 1 hour
   await cacheHelpers.set(`prediction:${userId}`, predictionData, 3600);
   // Invalidate on period create/update
   await cacheHelpers.delete(`prediction:${userId}`);
   ```
-- ✅ **Database Indexing**: Indexes on `user_id`, foreign keys, composite unique constraints
+- **Database Indexing**: Indexes on `user_id`, foreign keys, composite unique constraints
   ```sql
   CREATE INDEX idx_periods_user_date ON periods(user_id, start_date DESC);
   CREATE UNIQUE INDEX unique_period_symptom ON symptoms(period_id, symptom_type);
   ```
-- ✅ **Rate Limiting**: 100 requests/15min per IP (express-rate-limit)
+- **Rate Limiting**: 100 requests/15min per IP (express-rate-limit)
 
 **Monitoring:**
 - Add APM (Application Performance Monitoring) - Datadog, New Relic, or Sentry
@@ -184,15 +184,15 @@ For detailed architecture, database schema, API specifications, and prediction a
 
 #### Phase 2: Horizontal Scaling (10K-100K Users)
 **Infrastructure:**
-- 🚀 **Multi-Region Deployment**: Deploy backend in US-East, EU-West, Asia-Pacific
-- 🚀 **Load Balancer**: Use AWS ALB or Cloudflare Load Balancing
-- 🚀 **Auto-Scaling**: Configure Kubernetes (EKS, GKE) or serverless functions
+-  **Multi-Region Deployment**: Deploy backend in US-East, EU-West, Asia-Pacific
+-  **Load Balancer**: Use AWS ALB or Cloudflare Load Balancing
+-  **Auto-Scaling**: Configure Kubernetes (EKS, GKE) or serverless functions
 
 **Database:**
-- 🗄️ **Read Replicas**: Create 2-3 read replicas for GET requests
+-  **Read Replicas**: Create 2-3 read replicas for GET requests
   - Write to primary: Period creation, user updates
   - Read from replicas: Predictions, history, analytics
-- 🗄️ **Database Sharding** (by user_id hash):
+-  **Database Sharding** (by user_id hash):
   ```
   Shard 0: users with user_id % 4 = 0
   Shard 1: users with user_id % 4 = 1
@@ -221,9 +221,9 @@ For detailed architecture, database schema, API specifications, and prediction a
   ```
 
 **API Optimization:**
-- 📊 **Batch Processing**: Process multiple period logs in bulk
-- 📊 **Async Jobs**: Use Bull/BullMQ for background prediction calculations
-- 📊 **Rate Limiting**: 100 requests/minute per user (using Redis)
+-  **Batch Processing**: Process multiple period logs in bulk
+-  **Async Jobs**: Use Bull/BullMQ for background prediction calculations
+-  **Rate Limiting**: 100 requests/minute per user (using Redis)
 
 **Expected Capacity:** ~100K DAU
 
@@ -268,19 +268,19 @@ For detailed architecture, database schema, API specifications, and prediction a
    - Real-time dashboards
 
 **Database Strategy:**
-- 🗄️ **Primary-Replica Setup** (per shard):
+-  **Primary-Replica Setup** (per shard):
   - 1 Primary (writes)
   - 3-5 Replicas (reads)
   - Automatic failover with Patroni
 
-- 🗄️ **Data Partitioning** (by date):
+-  **Data Partitioning** (by date):
   ```sql
   -- Partition periods table by year
   CREATE TABLE periods_2026 PARTITION OF periods
     FOR VALUES FROM ('2026-01-01') TO ('2027-01-01');
   ```
 
-- 🗄️ **Cold Storage**: Move periods older than 2 years to S3 (via pg_archivecleanup)
+-  **Cold Storage**: Move periods older than 2 years to S3 (via pg_archivecleanup)
 
 **Advanced Caching:**
 - 💾 **Multi-Layer Cache**:
@@ -300,19 +300,19 @@ For detailed architecture, database schema, API specifications, and prediction a
   ```
 
 **Performance Optimizations:**
-- ⚡ **GraphQL** (instead of REST): Reduce over-fetching
-- ⚡ **gRPC**: For internal service-to-service communication (faster than REST)
-- ⚡ **WebSocket**: Real-time updates for notifications
-- ⚡ **Background Jobs**: Offload heavy computations
+-  **GraphQL** (instead of REST): Reduce over-fetching
+-  **gRPC**: For internal service-to-service communication (faster than REST)
+-  **WebSocket**: Real-time updates for notifications
+-  **Background Jobs**: Offload heavy computations
   ```
   User logs period → Queue job → Worker calculates prediction → Cache result
   ```
 
 **Observability:**
-- 📊 **Distributed Tracing**: Jaeger or OpenTelemetry
-- 📊 **Centralized Logging**: ELK Stack (Elasticsearch, Logstash, Kibana)
-- 📊 **Metrics**: Prometheus + Grafana
-- 📊 **Alerts**: PagerDuty for critical issues
+-  **Distributed Tracing**: Jaeger or OpenTelemetry
+-  **Centralized Logging**: ELK Stack (Elasticsearch, Logstash, Kibana)
+-  **Metrics**: Prometheus + Grafana
+-  **Alerts**: PagerDuty for critical issues
 
 **Expected Capacity:** 1M+ DAU
 
@@ -334,12 +334,12 @@ For detailed architecture, database schema, API specifications, and prediction a
 - 🤖 **Batch Inference**: Run predictions for all users overnight
 
 **Database Optimizations:**
-- 🗄️ **CQRS Pattern**: Separate read/write databases
+-  **CQRS Pattern**: Separate read/write databases
   - Write DB: PostgreSQL (normalized, ACID)
   - Read DB: MongoDB (denormalized, fast reads)
   - Sync via Change Data Capture (CDC) with Debezium
 
-- 🗄️ **Time-Series Database**: Use TimescaleDB for cycle analytics
+-  **Time-Series Database**: Use TimescaleDB for cycle analytics
   ```sql
   -- Hypertable for fast time-series queries
   SELECT time_bucket('1 month', start_date) as month,
@@ -360,10 +360,10 @@ For detailed architecture, database schema, API specifications, and prediction a
 - 🌍 **Data Residency**: Comply with GDPR/HIPAA by storing EU user data in EU
 
 **Cost Optimization:**
-- 💰 **Serverless for Spiky Workloads**: AWS Lambda for notifications
-- 💰 **Spot Instances**: Use EC2 Spot for batch jobs (70% cost savings)
-- 💰 **Database Query Optimization**: Reduce query time from 100ms to 10ms
-- 💰 **Compression**: Use Brotli for API responses (reduce bandwidth by 50%)
+-  **Serverless for Spiky Workloads**: AWS Lambda for notifications
+-  **Spot Instances**: Use EC2 Spot for batch jobs (70% cost savings)
+-  **Database Query Optimization**: Reduce query time from 100ms to 10ms
+-  **Compression**: Use Brotli for API responses (reduce bandwidth by 50%)
 
 **Expected Capacity:** 5M+ DAU
 
@@ -397,7 +397,7 @@ For detailed architecture, database schema, API specifications, and prediction a
 6. **Global CDN**: Serve frontend from edge locations (Vercel/Cloudflare)
 7. **Monitoring**: Invest in observability early to catch issues before users do
 
-**Current Status:** ✅ Ready for Phase 1 (0-10K users)  
+**Current Status:** Ready for Phase 1 (0-10K users)  
 **Next Steps:** Implement Redis caching and database indexing
 
 ## Setup Instructions

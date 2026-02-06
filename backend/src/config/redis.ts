@@ -9,14 +9,14 @@ if (REDIS_URL) {
   redis = new Redis(REDIS_URL);
   
   redis.on('connect', () => {
-    console.log('✅ Redis connected successfully');
+    console.log('Redis connected successfully');
   });
   
   redis.on('error', (err) => {
     console.error('Redis error:', err);
   });
 } else {
-  console.log('ℹ️  Redis not configured - caching disabled');
+  console.log('Redis not configured - caching disabled');
 }
 
 export const redisClient = redis;

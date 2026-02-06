@@ -57,18 +57,18 @@ app.use(errorHandler);
 const startServer = async () => {
   try {
     await sequelize.authenticate();
-    console.log('✅ Database connection established successfully.');
+    console.log('Database connection established successfully.');
     
     await sequelize.sync();
-    console.log('✅ All models synchronized.');
+    console.log('All models synchronized.');
     
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
-      console.log(`📊 Health check: http://localhost:${PORT}/health`);
-      console.log(`🗄️  ORM: Sequelize + PostgreSQL`);
+      console.log(`Server running on http://localhost:${PORT}`);
+      console.log(`Health check: http://localhost:${PORT}/health`);
+      console.log(`ORM: Sequelize + PostgreSQL`);
     });
   } catch (error) {
-    console.error('❌ Unable to connect to database:', error);
+    console.error('Unable to connect to database:', error);
     process.exit(1);
   }
 };
