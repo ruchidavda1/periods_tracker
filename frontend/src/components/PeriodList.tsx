@@ -49,10 +49,7 @@ export default function PeriodList({ periods, onDelete, onEdit, editingPeriod, o
     return icons[symptomType] || '📝';
   };
 
-  const formatSymptomType = (type: string, notes?: string) => {
-    if (type === 'other' && notes) {
-      return notes.charAt(0).toUpperCase() + notes.slice(1);
-    }
+  const formatSymptomType = (type: string) => {
     return type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
@@ -142,7 +139,7 @@ export default function PeriodList({ periods, onDelete, onEdit, editingPeriod, o
                             title={symptom.notes || ''}
                           >
                             <span>{getSymptomIcon(symptom.symptom_type)}</span>
-                            <span>{formatSymptomType(symptom.symptom_type, symptom.notes || '')}</span>
+                            <span>{formatSymptomType(symptom.symptom_type)}</span>
                             <span className="font-semibold">({symptom.severity}/5)</span>
                           </span>
                         ))}

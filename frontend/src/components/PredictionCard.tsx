@@ -189,9 +189,24 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
 
       {/* Info Banner */}
       <div className="mt-5 bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p className="text-sm text-blue-800">
-          Based on last {prediction.cycle_stats.cycles_tracked} cycles using weighted averages
-        </p>
+        {prediction.cycle_stats.cycles_tracked < 3 ? (
+          <div className="flex items-start gap-2">
+            <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <p className="text-sm font-semibold text-blue-800 mb-1">Limited Data - Using Default Prediction</p>
+              <p className="text-xs text-blue-700">
+                You've tracked {prediction.cycle_stats.cycles_tracked} cycle{prediction.cycle_stats.cycles_tracked !== 1 ? 's' : ''}. 
+                Add at least 3 cycles for personalized predictions based on your actual patterns.Currently using default prediction.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-blue-800">
+            Based on last {prediction.cycle_stats.cycles_tracked} cycles using weighted averages
+          </p>
+        )}
       </div>
     </div>
   );
