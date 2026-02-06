@@ -37,7 +37,10 @@ export default function SymptomInsights() {
     return icons[symptomType] || '📝';
   };
 
-  const formatSymptomType = (type: string) => {
+  const formatSymptomType = (type: string, notes?: string) => {
+    if (type === 'other' && notes) {
+      return notes.charAt(0).toUpperCase() + notes.slice(1);
+    }
     return type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
