@@ -51,7 +51,7 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
 
       <div className="grid md:grid-cols-2 gap-5">
         {/* Next Period Card */}
-        <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl p-5 border border-primary-200 hover:shadow-md transition-shadow">
+        <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl p-5 border border-primary-200">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-semibold text-primary-800">Next Period</h3>
             <span className="text-sm font-medium text-primary-600 bg-white px-3 py-1 rounded-full shadow-sm">
@@ -92,7 +92,7 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
         </div>
 
         {/* Ovulation Window Card */}
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-5 border border-purple-200 hover:shadow-md transition-shadow">
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-5 border border-purple-200">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-semibold text-purple-800">Fertile Window</h3>
             <span className="text-sm text-purple-600 bg-white px-3 py-1 rounded-full shadow-sm">
@@ -126,28 +126,28 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
 
       {/* Cycle Stats */}
       <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+        <div className="bg-gray-50 rounded-lg p-4">
           <p className="text-xs text-gray-600 mb-1">Avg Cycle</p>
           <p className="text-xl font-bold text-gray-800">
             {prediction.cycle_stats.avg_cycle_length}<span className="text-sm ml-1">days</span>
           </p>
         </div>
         
-        <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+        <div className="bg-gray-50 rounded-lg p-4">
           <p className="text-xs text-gray-600 mb-1">Avg Period</p>
           <p className="text-xl font-bold text-gray-800">
             {prediction.cycle_stats.avg_period_length}<span className="text-sm ml-1">days</span>
           </p>
         </div>
         
-        <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+        <div className="bg-gray-50 rounded-lg p-4">
           <p className="text-xs text-gray-600 mb-1">Tracked</p>
           <p className="text-xl font-bold text-gray-800">
             {prediction.cycle_stats.cycles_tracked}
           </p>
         </div>
         
-        <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+        <div className="bg-gray-50 rounded-lg p-4">
           <p className="text-xs text-gray-600 mb-1">Regularity</p>
           <span className={`inline-block text-sm font-semibold px-3 py-1.5 rounded-full ${getRegularityColor(prediction.cycle_stats.cycle_regularity)}`}>
             {prediction.cycle_stats.cycle_regularity.replace('_', ' ')}
