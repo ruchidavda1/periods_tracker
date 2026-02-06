@@ -33,6 +33,20 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
     }
   };
 
+  const getVariationColor = (stdDev: number) => {
+    if (stdDev < 2) return 'text-green-600 bg-green-50'; // Very consistent
+    if (stdDev < 4) return 'text-blue-600 bg-blue-50';  // Typical
+    if (stdDev < 7) return 'text-yellow-600 bg-yellow-50'; // Variable
+    return 'text-orange-600 bg-orange-50'; // Highly variable
+  };
+
+  const getVariationLabel = (stdDev: number) => {
+    if (stdDev < 2) return 'Very Typical';
+    if (stdDev < 4) return 'Typical';
+    if (stdDev < 7) return 'Variable';
+    return 'Atypical';
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -125,12 +139,22 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
       </div>
 
       {/* Cycle Stats */}
-      <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="mt-5 grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="bg-gray-50 rounded-lg p-4">
           <p className="text-xs text-gray-600 mb-1">Avg Cycle</p>
           <p className="text-xl font-bold text-gray-800">
             {prediction.cycle_stats.avg_cycle_length}<span className="text-sm ml-1">days</span>
           </p>
+        </div>
+        
+        <div className="bg-gray-50 rounded-lg p-4">
+          <p className="text-xs text-gray-600 mb-1">Cycle Variation</p>
+          <p className="text-xl font-bold text-gray-800">
+            {prediction.cycle_stats.standard_deviation}<span className="text-sm ml-1">days</span>
+          </p>
+          <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full mt-1.5 ${getVariationColor(parseFloat(prediction.cycle_stats.standard_deviation))}`}>
+            {getVariationLabel(parseFloat(prediction.cycle_stats.standard_deviation))}
+          </span>
         </div>
         
         <div className="bg-gray-50 rounded-lg p-4">
@@ -143,12 +167,12 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
         <div className="bg-gray-50 rounded-lg p-4">
           <p className="text-xs text-gray-600 mb-1">Tracked</p>
           <p className="text-xl font-bold text-gray-800">
-            {prediction.cycle_stats.cycles_tracked}
+            {prediction.cycle_stats.cycles_tracked}<span className="text-sm ml-1">cycles</span>
           </p>
         </div>
         
         <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-xs text-gray-600 mb-1">Regularity</p>
+          <p className="text-xs text-gray-600 mb-2">Regularity</p>
           <span className={`inline-block text-sm font-semibold px-3 py-1.5 rounded-full ${getRegularityColor(prediction.cycle_stats.cycle_regularity)}`}>
             {prediction.cycle_stats.cycle_regularity.replace('_', ' ')}
           </span>
