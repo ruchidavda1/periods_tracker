@@ -48,24 +48,6 @@ export default function CalendarHeatmap({ periods }: CalendarHeatmapProps) {
     });
   };
 
-  // Check if a date has symptoms (but NOT on period days - those will be red)
-  const hasSymptoms = (day: number) => {
-    const checkDate = new Date(year, month, day);
-    checkDate.setHours(0, 0, 0, 0);
-    
-    // Don't show symptoms on period days (they'll be red)
-    if (isPeriodDay(day)) return false;
-    
-    return periods.some(period => {
-      const symptoms = (period as any).symptoms || [];
-      return symptoms.some((symptom: any) => {
-        const symptomDate = new Date(symptom.date);
-        symptomDate.setHours(0, 0, 0, 0);
-        return symptomDate.getTime() === checkDate.getTime();
-      });
-    });
-  };
-
   const getDayColor = (day: number) => {
     if (isPeriodDay(day)) {
       return 'bg-red-400 text-white font-bold hover:bg-red-500';
