@@ -47,6 +47,14 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
     return 'Atypical';
   };
 
+  const formatVariation = (stdDev: string) => {
+    const value = parseFloat(stdDev);
+    // If less than 0.5, show as "< 1" instead of 0.00
+    if (value < 0.5) return '< 1';
+    // Round to 1 decimal place
+    return value.toFixed(1);
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -150,7 +158,7 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
         <div className="bg-gray-50 rounded-lg p-4">
           <p className="text-xs text-gray-600 mb-1">Cycle Variation</p>
           <p className="text-xl font-bold text-gray-800">
-            {prediction.cycle_stats.standard_deviation}<span className="text-sm ml-1">days</span>
+            {formatVariation(prediction.cycle_stats.standard_deviation)}<span className="text-sm ml-1">days</span>
           </p>
           <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full mt-1.5 ${getVariationColor(parseFloat(prediction.cycle_stats.standard_deviation))}`}>
             {getVariationLabel(parseFloat(prediction.cycle_stats.standard_deviation))}
