@@ -76,7 +76,7 @@ jobs:
         working-directory: ./frontend
         run: npm run build
         env:
-          VITE_BACKEND_API_URL: https://round-judy-abcdefghiw-b8b6fbce.koyeb.app
+          VITE_BACKEND_API_URL: https://periods-tracker.onrender.com
 
       - name: Check build output
         working-directory: ./frontend
@@ -105,4 +105,4 @@ jobs:
           echo ""
           echo "Live URLs:"
           echo "  - Frontend: https://periods-tracker-xi.vercel.app"
-          echo "  - Backend: https://round-judy-abcdefghiw-b8b6fbce.koyeb.app"
+          echo "  - Backend: https://periods-tracker.onrender.com"
