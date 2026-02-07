@@ -139,7 +139,7 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
               <div key={index} className="min-w-full">
                 <div className="grid md:grid-cols-2 gap-5">
                   {/* Period Card */}
-                  <div className={`rounded-xl p-5 border ${
+                  <div className={`rounded-xl p-5 border min-h-[280px] ${
                     index === 0
                       ? 'bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200'
                       : index === 1
@@ -197,7 +197,7 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
                       </div>
 
                       {/* Show flow intensity only for first cycle */}
-                      {index === 0 && prediction.next_period.predicted_flow_intensity && (
+                      {index === 0 && prediction.next_period.predicted_flow_intensity ? (
                         <div className={`pt-3 border-t ${
                           index === 0 ? 'border-primary-200' : 'border-blue-200'
                         }`}>
@@ -210,12 +210,16 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
                             {prediction.next_period.predicted_flow_intensity}
                           </span>
                         </div>
+                      ) : index === 0 ? (
+                        <div className="h-[72px]"></div>
+                      ) : (
+                        <div className="h-[72px]"></div>
                       )}
                     </div>
                   </div>
 
                   {/* Ovulation Window Card */}
-                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-5 border border-purple-200">
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-5 border border-purple-200 min-h-[280px]">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-base font-semibold text-purple-800">Fertile Window</h3>
                       <span className="text-sm text-purple-600 bg-white px-3 py-1 rounded-full shadow-sm">
