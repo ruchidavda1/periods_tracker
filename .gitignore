@@ -2,13 +2,15 @@
 node_modules/
 
 # Environment variables
-# Backend .env files (keep .env.example in git)
+# Keep only .env.example files in git
 backend/.env
 backend/.env.local
 backend/.env.*.local
 backend/.env.production
 
-# Frontend only ignores production override
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
 frontend/.env.production.local
 
 
