@@ -76,7 +76,7 @@ jobs:
         working-directory: ./frontend
         run: npm run build
         env:
-          VITE_API_URL: https://round-judy-abcdefghiw-b8b6fbce.koyeb.app
+          BACKEND_API_URL: https://round-judy-abcdefghiw-b8b6fbce.koyeb.app
 
       - name: Check build output
         working-directory: ./frontend
