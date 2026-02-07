@@ -74,6 +74,7 @@ router.get('/calendar', async (req: Request, res: Response, next: NextFunction) 
           ovulation_start: p.ovulationStart.toISOString().split('T')[0],
           ovulation_end: p.ovulationEnd.toISOString().split('T')[0],
           confidence_score: p.confidenceScore,
+          predicted_flow_intensity: p.predictedFlowIntensity,
         })),
         cycle_stats: {
           avg_cycle_length: Math.round(result.cycleStats.avgCycleLength),

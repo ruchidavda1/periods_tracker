@@ -104,6 +104,7 @@ export interface CalendarPrediction {
   ovulation_start: string;
   ovulation_end: string;
   confidence_score: number;
+  predicted_flow_intensity: 'light' | 'moderate' | 'heavy' | null;
 }
 
 export const predictionAPI = {
