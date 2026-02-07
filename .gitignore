@@ -2,13 +2,15 @@
 node_modules/
 
 # Environment variables
-.env
-.env.local
-.env.*.local
-
-# Production env files (contain deployment URLs)
-frontend/.env.production.local
+# Backend .env files (keep .env.example in git)
+backend/.env
+backend/.env.local
+backend/.env.*.local
 backend/.env.production
+
+# Frontend only ignores production override
+frontend/.env.production.local
+
 
 # Build outputs
 dist/
