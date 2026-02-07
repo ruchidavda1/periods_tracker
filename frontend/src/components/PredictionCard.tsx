@@ -1,19 +1,28 @@
 import { useState, useEffect } from 'react';
-import { Prediction, predictionAPI, CalendarPrediction } from '../api';
+import { Prediction, predictionAPI } from '../api';
 
 interface PredictionCardProps {
   prediction: Prediction;
+  allPredictions?: Prediction[];
 }
 
-export default function PredictionCard({ prediction }: PredictionCardProps) {
-  const [multiplePredictions, setMultiplePredictions] = useState<CalendarPrediction[]>([]);
+export default function PredictionCard({ prediction, allPredictions = [] }: PredictionCardProps) {
+  const [multiplePredictions, setMultiplePredictions] = useState<Prediction[]>(allPredictions);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Only fetch if not provided
   useEffect(() => {
+    if (allPredictions.length > 0) {
+      setMultiplePredictions(allPredictions);
+      return;
+    }
+    
     const fetchMultiplePredictions = async () => {
+      setIsLoading(true);
       try {
         const data = await predictionAPI.getCalendar(3);
+        console.log('Calendar API response:', data);
         setMultiplePredictions(data.predictions || []);
       } catch (error) {
         console.error('Failed to fetch multiple predictions:', error);
@@ -22,7 +31,7 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
       }
     };
     fetchMultiplePredictions();
-  }, []);
+  }, [allPredictions]);
 
   const getRegularityColor = (regularity: string) => {
     switch (regularity) {
@@ -267,68 +276,72 @@ export default function PredictionCard({ prediction }: PredictionCardProps) {
         ))}
       </div>
 
-      {/* Cycle Stats */}
-      <div className="mt-5 grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-xs text-gray-600 mb-1">Avg Cycle</p>
-          <p className="text-xl font-bold text-gray-800">
-            {prediction.cycle_stats.avg_cycle_length}<span className="text-sm ml-1">days</span>
-          </p>
-        </div>
-        
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-xs text-gray-600 mb-1">Cycle Variation</p>
-          <p className="text-xl font-bold text-gray-800">
-            {formatVariation(prediction.cycle_stats.standard_deviation)}<span className="text-sm ml-1">days</span>
-          </p>
-          <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full mt-1.5 ${getVariationColor(parseFloat(prediction.cycle_stats.standard_deviation))}`}>
-            {getVariationLabel(parseFloat(prediction.cycle_stats.standard_deviation))}
-          </span>
-        </div>
-        
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-xs text-gray-600 mb-1">Avg Period</p>
-          <p className="text-xl font-bold text-gray-800">
-            {prediction.cycle_stats.avg_period_length}<span className="text-sm ml-1">days</span>
-          </p>
-        </div>
-        
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-xs text-gray-600 mb-1">Tracked</p>
-          <p className="text-xl font-bold text-gray-800">
-            {prediction.cycle_stats.cycles_tracked}<span className="text-sm ml-1">cycles</span>
-          </p>
-        </div>
-        
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-xs text-gray-600 mb-2">Regularity</p>
-          <span className={`inline-block text-sm font-semibold px-3 py-1.5 rounded-full ${getRegularityColor(prediction.cycle_stats.cycle_regularity)}`}>
-            {prediction.cycle_stats.cycle_regularity.replace('_', ' ')}
-          </span>
-        </div>
-      </div>
-
-      {/* Info Banner */}
-      <div className="mt-5 bg-blue-50 border border-blue-200 rounded-lg p-4">
-        {prediction.cycle_stats.cycles_tracked < 3 ? (
-          <div className="flex items-start gap-2">
-            <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div>
-              <p className="text-sm font-semibold text-blue-800 mb-1">Limited Data - Using Default Prediction</p>
-              <p className="text-xs text-blue-700">
-                You've tracked {prediction.cycle_stats.cycles_tracked} cycle{prediction.cycle_stats.cycles_tracked !== 1 ? 's' : ''}. 
-                Add at least 3 cycles for personalized predictions based on your actual patterns. Currently using default standard cycle length of 28 days.
+      {/* Cycle Stats - Only show if available */}
+      {prediction.cycle_stats && (
+        <>
+          <div className="mt-5 grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-xs text-gray-600 mb-1">Avg Cycle</p>
+              <p className="text-xl font-bold text-gray-800">
+                {prediction.cycle_stats.avg_cycle_length}<span className="text-sm ml-1">days</span>
               </p>
             </div>
+            
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-xs text-gray-600 mb-1">Cycle Variation</p>
+              <p className="text-xl font-bold text-gray-800">
+                {formatVariation(prediction.cycle_stats.standard_deviation)}<span className="text-sm ml-1">days</span>
+              </p>
+              <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full mt-1.5 ${getVariationColor(parseFloat(prediction.cycle_stats.standard_deviation))}`}>
+                {getVariationLabel(parseFloat(prediction.cycle_stats.standard_deviation))}
+              </span>
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-xs text-gray-600 mb-1">Avg Period</p>
+              <p className="text-xl font-bold text-gray-800">
+                {prediction.cycle_stats.avg_period_length}<span className="text-sm ml-1">days</span>
+              </p>
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-xs text-gray-600 mb-1">Tracked</p>
+              <p className="text-xl font-bold text-gray-800">
+                {prediction.cycle_stats.cycles_tracked}<span className="text-sm ml-1">cycles</span>
+              </p>
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-xs text-gray-600 mb-2">Regularity</p>
+              <span className={`inline-block text-sm font-semibold px-3 py-1.5 rounded-full ${getRegularityColor(prediction.cycle_stats.cycle_regularity)}`}>
+                {prediction.cycle_stats.cycle_regularity.replace('_', ' ')}
+              </span>
+            </div>
           </div>
-        ) : (
-          <p className="text-sm text-blue-800">
-            Based on last {prediction.cycle_stats.cycles_tracked} cycles using weighted averages
-          </p>
-        )}
-      </div>
+
+          {/* Info Banner */}
+          <div className="mt-5 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            {prediction.cycle_stats.cycles_tracked < 3 ? (
+              <div className="flex items-start gap-2">
+                <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <p className="text-sm font-semibold text-blue-800 mb-1">Limited Data - Using Default Prediction</p>
+                  <p className="text-xs text-blue-700">
+                    You've tracked {prediction.cycle_stats.cycles_tracked} cycle{prediction.cycle_stats.cycles_tracked !== 1 ? 's' : ''}. 
+                    Add at least 3 cycles for personalized predictions based on your actual patterns. Currently using default standard cycle length of 28 days.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-blue-800">
+                Based on last {prediction.cycle_stats.cycles_tracked} cycles using weighted averages
+              </p>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

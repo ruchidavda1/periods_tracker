@@ -76,44 +76,56 @@ export const periodAPI = {
   },
 };
 
-// Prediction API
+// Prediction API - Unified Interface
 export interface Prediction {
-  next_period: {
-    predicted_start_date: string;
-    predicted_end_date: string;
-    confidence_score: number;
-    predicted_flow_intensity: 'light' | 'moderate' | 'heavy' | null;
-  };
-  ovulation: {
-    predicted_start_date: string;
-    predicted_end_date: string;
-  };
-  cycle_stats: {
+  // Cycle identification (only in calendar view)
+  cycle_number?: number;
+  
+  // Period prediction
+  predicted_start_date: string;
+  predicted_end_date: string;
+  confidence_score: number;
+  predicted_flow_intensity: 'light' | 'moderate' | 'heavy' | null;
+  
+  // Ovulation prediction
+  ovulation_start: string;
+  ovulation_end: string;
+  
+  // Statistics (only in single prediction view)
+  cycle_stats?: {
     avg_cycle_length: number;
     avg_period_length: number;
     cycle_regularity: string;
+    cycle_variation: string;
     cycles_tracked: number;
     standard_deviation: string;
   };
 }
 
-export interface CalendarPrediction {
-  cycle_number: number;
-  predicted_start_date: string;
-  predicted_end_date: string;
-  ovulation_start: string;
-  ovulation_end: string;
-  confidence_score: number;
-  predicted_flow_intensity: 'light' | 'moderate' | 'heavy' | null;
-}
 
 export const predictionAPI = {
   getNextPeriod: async (): Promise<Prediction> => {
     const response = await api.get('/predictions/next-period');
-    return response.data.data;
+    const data = response.data.data;
+    
+    // Check if data is in the nested format (legacy backend response)
+    if (data && data.next_period) {
+      // Transform nested backend format to flat unified format
+      return {
+        predicted_start_date: data.next_period.predicted_start_date,
+        predicted_end_date: data.next_period.predicted_end_date,
+        confidence_score: data.next_period.confidence_score,
+        predicted_flow_intensity: data.next_period.predicted_flow_intensity,
+        ovulation_start: data.ovulation.predicted_start_date,
+        ovulation_end: data.ovulation.predicted_end_date,
+        cycle_stats: data.cycle_stats,
+      };
+    }
+    
+    return data;
   },
   
-  getCalendar: async (months: number = 3) => {
+  getCalendar: async (months: number = 3): Promise<{ predictions: Prediction[]; cycle_stats: Prediction['cycle_stats'] }> => {
     const response = await api.get(`/predictions/calendar?months=${months}`);
     return response.data.data;
   },

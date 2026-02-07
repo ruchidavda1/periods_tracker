@@ -9,7 +9,6 @@ router.use(authMiddleware);
 router.get('/next-period', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user!.id;
-    
     const cacheKey = `prediction:${userId}`;
     const cachedPrediction = await cacheHelpers.get(cacheKey);
     
@@ -39,6 +38,7 @@ router.get('/next-period', async (req: Request, res: Response, next: NextFunctio
         avg_cycle_length: Math.round(prediction.cycleStats.avgCycleLength),
         avg_period_length: Math.round(prediction.cycleStats.avgPeriodLength),
         cycle_regularity: prediction.cycleStats.regularity,
+        cycle_variation: prediction.cycleStats.standardDeviation.toFixed(2),
         cycles_tracked: prediction.cycleStats.cyclesTracked,
         standard_deviation: prediction.cycleStats.standardDeviation.toFixed(2),
       },
@@ -80,7 +80,9 @@ router.get('/calendar', async (req: Request, res: Response, next: NextFunction) 
           avg_cycle_length: Math.round(result.cycleStats.avgCycleLength),
           avg_period_length: Math.round(result.cycleStats.avgPeriodLength),
           cycle_regularity: result.cycleStats.regularity,
+          cycle_variation: result.cycleStats.standardDeviation.toFixed(2),
           cycles_tracked: result.cycleStats.cyclesTracked,
+          standard_deviation: result.cycleStats.standardDeviation.toFixed(2),
         },
       },
     });

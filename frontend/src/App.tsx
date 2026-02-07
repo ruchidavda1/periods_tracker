@@ -13,6 +13,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [periods, setPeriods] = useState<Period[]>([]);
   const [prediction, setPrediction] = useState<Prediction | null>(null);
+  const [calendarData, setCalendarData] = useState<{ predictions: Prediction[]; cycle_stats: any } | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingPeriod, setEditingPeriod] = useState<Period | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -34,16 +35,25 @@ function App() {
   const loadData = async () => {
     try {
       setIsLoading(true);
-      const [periodsData, predictionData] = await Promise.all([
+      const [periodsData, calendarData] = await Promise.all([
         periodAPI.getAll(),
-        predictionAPI.getNextPeriod().catch((err) => {
+        predictionAPI.getCalendar(3).catch((err) => {
           console.error('Prediction error:', err);
           return null;
         }), // Prediction might fail if not enough data
       ]);
-      console.log('Loaded data:', { periodsData, predictionData });
+      console.log('Loaded data:', { periodsData, calendarData });
       setPeriods(periodsData.periods);
-      setPrediction(predictionData);
+      setCalendarData(calendarData);
+    
+      if (calendarData && calendarData.predictions.length > 0) {
+        const firstPrediction = {
+          ...calendarData.predictions[0],
+          cycle_stats: calendarData.cycle_stats,
+        };
+        setPrediction(firstPrediction);
+      }
+      
       setError(null);
     } catch (err: any) {
       console.error('Error loading data:', err);
@@ -201,12 +211,12 @@ function App() {
         {periods.length > 0 && (
           <CycleProgressBar 
             periods={periods} 
-            nextPeriodDate={prediction?.next_period.predicted_start_date || null}
+            nextPeriodDate={prediction?.predicted_start_date || null}
           />
         )}
 
         {/* Prediction Card */}
-        {prediction && <PredictionCard prediction={prediction} />}
+        {prediction && <PredictionCard prediction={prediction} allPredictions={calendarData?.predictions || []} />}
 
         {/* Actions */}
         <div className="mb-6 flex gap-3">
