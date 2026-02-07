@@ -1,8 +1,12 @@
 import { useState } from 'react';
-import { Period } from '../api';
+import { Period, Symptom } from '../api';
 
 interface CalendarHeatmapProps {
   periods: Period[];
+}
+
+interface PeriodWithSymptoms extends Period {
+  symptoms?: Symptom[];
 }
 
 export default function CalendarHeatmap({ periods }: CalendarHeatmapProps) {
@@ -46,6 +50,39 @@ export default function CalendarHeatmap({ periods }: CalendarHeatmapProps) {
       fertileEnd.setDate(fertileEnd.getDate() + 4);
       return checkDate >= fertileStart && checkDate <= fertileEnd;
     });
+  };
+
+  // Get symptoms for a specific date
+  const getSymptomsForDate = (day: number): string[] => {
+    const checkDate = new Date(year, month, day);
+    // Create date string in local timezone to avoid timezone shift
+    const dateString = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
+    
+    const symptoms: string[] = [];
+    (periods as PeriodWithSymptoms[]).forEach(period => {
+      if (period.symptoms) {
+        period.symptoms.forEach(symptom => {
+          if (symptom.date === dateString) {
+            symptoms.push(getSymptomIcon(symptom.symptom_type));
+          }
+        });
+      }
+    });
+    
+    return symptoms;
+  };
+
+  const getSymptomIcon = (symptomType: string) => {
+    const icons: { [key: string]: string } = {
+      'cramps': '🩹',
+      'headache': '🤕',
+      'mood_swings': '😢',
+      'fatigue': '😴',
+      'bloating': '🎈',
+      'acne': '🔴',
+      'other': '📝',
+    };
+    return icons[symptomType] || '📝';
   };
 
   const getDayColor = (day: number) => {
@@ -123,7 +160,7 @@ export default function CalendarHeatmap({ periods }: CalendarHeatmapProps) {
           return (
             <div
               key={dayNumber}
-              className={`w-9 h-9 flex items-center justify-center rounded text-xs font-medium transition-all cursor-pointer ${getDayColor(dayNumber)} ${
+              className={`w-9 h-9 flex flex-col items-center justify-center rounded text-xs font-medium transition-all cursor-pointer ${getDayColor(dayNumber)} ${
                 isToday(dayNumber) ? 'ring-2 ring-primary-500' : ''
               }`}
               title={
@@ -132,7 +169,12 @@ export default function CalendarHeatmap({ periods }: CalendarHeatmapProps) {
                 ''
               }
             >
-              {dayNumber}
+              <span className="text-[10px]">{dayNumber}</span>
+              {getSymptomsForDate(dayNumber).length > 0 && (
+                <span className="text-[8px] leading-none">
+                  {getSymptomsForDate(dayNumber).slice(0, 2).join('')}
+                </span>
+              )}
             </div>
           );
         })}
@@ -147,6 +189,41 @@ export default function CalendarHeatmap({ periods }: CalendarHeatmapProps) {
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 bg-purple-300 rounded"></div>
           <span className="text-xs text-gray-600">Fertile</span>
+        </div>
+      </div>
+
+      {/* Symptoms Legend */}
+      <div className="mt-2 pt-2 border-t border-gray-200">
+        <p className="text-xs text-gray-500 text-center mb-2">Symptoms</p>
+        <div className="flex flex-wrap gap-2 justify-center text-xs">
+          <div className="flex items-center gap-1">
+            <span>🩹</span>
+            <span className="text-gray-600">Cramps</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span>🤕</span>
+            <span className="text-gray-600">Headache</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span>😢</span>
+            <span className="text-gray-600">Mood Swings</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span>😴</span>
+            <span className="text-gray-600">Fatigue</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span>🎈</span>
+            <span className="text-gray-600">Bloating</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span>🔴</span>
+            <span className="text-gray-600">Acne</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span>📝</span>
+            <span className="text-gray-600">Other</span>
+          </div>
         </div>
       </div>
     </div>

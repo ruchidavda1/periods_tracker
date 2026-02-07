@@ -11,6 +11,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:ratelimit": "node test-rate-limiter.js",
+    "check:ratelimit": "node check-rate-limiter.js",
     "cleanup:duplicates": "tsx src/scripts/cleanup-duplicate-symptoms.ts"
   },
   "keywords": [

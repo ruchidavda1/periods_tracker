@@ -80,6 +80,7 @@ function App() {
     flow_intensity?: 'light' | 'moderate' | 'heavy';
     notes?: string;
     symptoms?: Array<{
+      date: string;
       symptom_type: string;
       severity: number;
       notes?: string;
@@ -98,12 +99,12 @@ function App() {
         periodId = result.data.id;
       }
 
-      // Add symptoms if any
+      // Add symptoms if any (now with proper dates)
       if (data.symptoms && data.symptoms.length > 0 && periodId) {
         await Promise.all(
           data.symptoms.map(symptom =>
             symptomAPI.create(periodId, {
-              date: data.start_date,
+              date: symptom.date,  // Use actual date from symptom
               symptom_type: symptom.symptom_type as any,
               severity: symptom.severity,
               notes: symptom.notes,

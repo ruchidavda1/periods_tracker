@@ -1,10 +1,11 @@
-import { PredictionService } from '../predictionService';
-import Period from '../../models/Period';
+import { PredictionService } from '../services/predictionService';
+import { jest } from '@jest/globals';
+import { test, expect, beforeEach, describe } from '@jest/globals';
 
 // Mock Sequelize models
-jest.mock('../../models/Period');
-jest.mock('../../models/UserSettings');
-jest.mock('../../models/Prediction');
+jest.mock('../models/Period');
+jest.mock('../models/UserSettings');
+jest.mock('../models/Prediction');
 
 describe('PredictionService - Integration Tests', () => {
   let predictionService: PredictionService;
