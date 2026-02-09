@@ -14,7 +14,7 @@ The database will be doing a full table scan. It will literally checking every s
 
 ### What we can do?
 
-Add indexes on the columns I we constantly filtering by:
+Add indexes on the columns constantly filtering by:
 
 ```sql
 CREATE INDEX idx_periods_user_id ON periods(user_id);
@@ -147,7 +147,7 @@ const periods = await Period.findAll({
 
 ---
 
-## 6. Implementing Pagination
+## 6. Implementing Pagination(any server side or client side)
 
 ### Making Lists User-Friendly
 
@@ -285,7 +285,7 @@ The prediction calculation involves fetching periods, calculating cycle lengths,
 
 Here's the thing though - predictions don't change unless the user adds a new period. So why recalculate every time?
 
-I added Redis caching:
+Added Redis caching:
 
 ```typescript
 app.get('/api/predictions/next-period', async (req, res) => {
