@@ -6,17 +6,18 @@ A full-stack period tracking app with smart predictions. Built this to learn mor
 
 ## What it does
 
-- Log periods with dates and flow intensity
+- Log periods with dates and flow intensity and symptoms tracking
 - Predicts your next period using weighted averages (gets better with more data)
 - Shows ovulation windows
 - Tracks symptoms and patterns
 - Gives confidence scores based on how regular your cycles are
 
-The prediction algorithm is the interesting part - it weights recent cycles more heavily than older ones, handles irregular cycles, and adjusts confidence based on data quality.
+The prediction algorithm is statistical and based on the weighted averages of the user's cycles it weights recent cycles more heavily than older ones, handles irregular cycles, and adjusts confidence based on data quality.
 
 ## Stack
 
 **Backend:**
+
 - Node.js + TypeScript + Express
 - PostgreSQL (Neon for hosting)
 - Redis for caching predictions
@@ -24,12 +25,15 @@ The prediction algorithm is the interesting part - it weights recent cycles more
 - Jest for testing
 
 **Frontend:**
+
 - React + TypeScript
 - Vite
 - Tailwind CSS
 - Axios
 
 **Deployment:**
+Reasons for choosing these services: All free tier services.
+
 - Frontend: Vercel
 - Backend: Render
 - Database: Neon (serverless Postgres)
@@ -38,6 +42,7 @@ The prediction algorithm is the interesting part - it weights recent cycles more
 ## Quick Start
 
 ### Prerequisites
+
 - Node.js 18+
 - PostgreSQL (or use Neon - see below)
 
@@ -58,6 +63,7 @@ cp .env.example .env
 ```
 
 Your `.env` should have:
+
 ```
 DATABASE_URL=your_neon_postgres_url
 JWT_SECRET=some_random_string
@@ -66,6 +72,7 @@ PORT=3000
 ```
 
 Start the server:
+
 ```bash
 npm run dev
 ```
@@ -85,6 +92,7 @@ Frontend runs on `http://localhost:5000`, backend on `http://localhost:3000`.
 The algorithm uses weighted moving averages - basically, your last 3 cycles count for 50% of the prediction, the next 3 count for 30%, and older cycles get 20%.
 
 It calculates:
+
 - **Cycle length prediction** - weighted average of your past cycles
 - **Regularity** - standard deviation of cycle lengths (low = regular, high = irregular)
 - **Confidence score** - based on regularity + amount of data + how typical your cycle length is
@@ -93,7 +101,7 @@ Example: if you have 8 cycles averaging 28 days with a standard deviation of 2 d
 
 For irregular cycles, the confidence drops but it still tries to predict based on trends.
 
-**Want to learn more?** Check out [DOCUMENTATION.md](./DOCUMENTATION.md) for the complete algorithm breakdown with example.
+**Detailed prediction algorithm breakdown:** Check out [DOCUMENTATION.md](./DOCUMENTATION.md) for the complete algorithm breakdown with example.
 
 ## Database Schema
 
@@ -117,20 +125,22 @@ npm run test:coverage # with coverage
 ```
 
 Tests cover:
+
 - Prediction algorithm with different cycle patterns
 - Edge cases (insufficient data, irregular cycles)
 - Flow intensity predictions
 - Confidence score calculations
 
-## Performance Stuff
+## Performance Optimizations
 
 **Caching:** Redis caches predictions for 1 hour. Cache hit rate is around 85-90%, which means most requests do not hit the database. Invalidates automatically when you add/update periods.
 
-**Query optimization:** 
-- Use of indexes and composite indexes(implemented))
+**Query optimization:**
+
+- Use of indexes and composite indexes(implemented in the database schema)
 - Only fetch needed columns (sequelize feature) (Implemented)
 - Fixed N+1 queries by using eager loading (2 queries instead of 100+) (sequelize feature) (Implemented)
-- Pagination for long lists
+- Pagination for long lists (Server side / Client side)
 - Connection pooling (sequelize feature) (Implemented)
 
 See [QUERY_OPTIMIZATION.md](./QUERY_OPTIMIZATION.md) for details on what we can optimize if need to scale the app.
@@ -138,20 +148,24 @@ See [QUERY_OPTIMIZATION.md](./QUERY_OPTIMIZATION.md) for details on what we can 
 ## API Endpoints
 
 ### Auth
+
 - `POST /api/auth/register` - create account
 - `POST /api/auth/login` - login
 
 ### Periods
+
 - `POST /api/periods` - log a period
 - `GET /api/periods` - get your history (paginated)
 - `PUT /api/periods/:id` - update
 - `DELETE /api/periods/:id` - delete
 
 ### Predictions
+
 - `GET /api/predictions/next-period` - next cycle prediction (cached)
 - `GET /api/predictions/calendar?months=3` - future cycles for calendar view
 
 ### Symptoms
+
 - `POST /api/periods/:id/symptoms` - add symptom
 - `GET /api/symptoms/patterns` - get symptom patterns analysis
 - `DELETE /api/symptoms/:id` - remove symptom
@@ -160,15 +174,15 @@ All protected endpoints need JWT token in Authorization header.
 
 ## Security
 
-- Passwords hashed with bcrypt
+- Passwords hashed with bcrypt and use of salt
 - JWT tokens (7 day expiry)
 - Rate limiting (100 requests per 15 min per IP)
-- Input validation with Zod
+- Input validation with Zod npm package
 - Parameterized queries (no SQL injection)
 
 ## Deployment
 
-The app auto-deploys on push to main:
+The app auto-deploys on push to master branch:
 
 1. GitHub Actions runs tests
 2. If tests pass, Vercel deploys frontend
@@ -244,7 +258,7 @@ period_tracker/
 
 ## Future Ideas
 
-- ML model for better predictions (LSTM for time series)
+- ML model for better predictions (LSTM - Long Short-Term Memory networks)
 - Symptom pattern analysis
 - Notifications/reminders
 - Export data as CSV/PDF
@@ -256,7 +270,7 @@ period_tracker/
 
 - Needs at least 3 cycles for statistical predictions (uses defaults before that)
 - Does not handle pregnancy or menopause scenarios
-- Calendar predictions get less confident the further out you go
+- Calendar predictions get less confident the further out you go.
 - Free tier hosting means cold starts on backend (first request can be slow)
 
 ## Scaling Challenges
@@ -265,9 +279,7 @@ period_tracker/
 
 **The database** is the obvious bottleneck. Right now it is handling everything - all reads, all writes, on a single instance with limited connections (max 10 in our pool). As more users join, we would start seeing connection pool exhaustion pretty quickly. The indexes help, but once you have millions of period records, even indexed queries start slowing down.
 
-The other issue is that we are only caching the next-period prediction (which includes cycle stats). We do not cache period lists, symptom patterns, or calendar predictions - those hit the database every time. When we have 10K concurrent users all fetching their period history or checking predictions, the database is going to struggle.
-
-**The backend** would be the next problem. Single Node.js instance, and while we tried to keep things efficient, there are some CPU-intensive operations - calculating standard deviations for cycle regularity, bcrypt hashing during auth, generating predictions for users with years of data. Right now these take milliseconds, but under load they would pile up. Node's single-threaded nature means one slow request can slow down others.
+**The backend** would be the next problem. Single Node.js instance, and while we tried to keep things efficient, there are some CPU-intensive operations i.e. calculating standard deviations for cycle regularity, bcrypt hashing during auth, generating predictions for users with years of data. Right now these take milliseconds, but under load they would pile up. Node's single-threaded nature means one slow request can slow down others.
 
 Memory could also become an issue. If we are fetching large result sets (say, a user with 5 years of periods), we are loading all that into memory before sending it. No streaming, no chunking.
 
@@ -291,10 +303,10 @@ This is where the architecture would need serious changes:
 
 **Disk space** becomes a real concern. Millions of period records, predictions, symptoms - all growing continuously. We would need data retention policies. Maybe archive periods older than 2 years to cheaper cold storage.
 
-
-### Query Optimization 
+### Query Optimization
 
 The optimizations we can do are:
+
 - Only fetching what we need (we already have this) using attributes(sequelize feature)
 - Indexes prevent full table scans
 - Preventing duplicate data using composite indexes
