@@ -1,0 +1,34 @@
+{
+  "name": "period-tracker",
+  "version": "1.0.0",
+  "description": "Period Tracker Application - Full Stack",
+  "main": "backend/dist/index.js",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "build": "npm run install:all && npm run build:backend && npm run build:frontend",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm run preview -- --host 0.0.0.0 --port 5000",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "test": "cd backend && npm test",
+    "test:watch": "cd backend && npm run test:watch",
+    "test:coverage": "cd backend && npm run test:coverage"
+  },
+  "keywords": [
+    "period-tracker",
+    "health",
+    "react",
+    "express",
+    "postgresql"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

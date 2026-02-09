@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rate Limiter Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    h1 { color: #333; }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      margin: 10px 5px;
+    }
+    button:hover { background: #0056b3; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    #results {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f5f5f5;
+      border-radius: 4px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .log { margin: 5px 0; padding: 5px; }
+    .success { color: green; }
+    .error { color: red; }
+    .info { color: blue; }
+    .stats {
+      background: white;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <h1>API Rate Limiter Test</h1>
+  
+  <div class="stats" id="stats">
+    <h3>Rate Limit Status</h3>
+    <p><strong>Limit:</strong> <span id="limit">-</span></p>
+    <p><strong>Remaining:</strong> <span id="remaining">-</span></p>
+    <p><strong>Reset:</strong> <span id="reset">-</span></p>
+  </div>
+
+  <div>
+    <button onclick="testSingleRequest()">Test Single Request</button>
+    <button onclick="testMultipleRequests(10)">Test 10 Requests</button>
+    <button onclick="testMultipleRequests(50)">Test 50 Requests</button>
+    <button onclick="testMultipleRequests(105)">Test 105 Requests (Hit Limit)</button>
+    <button onclick="clearResults()">Clear Results</button>
+  </div>
+
+  <div id="results"></div>
+
+  <script>
+    const API_BASE = 'http://localhost:3000';
+    const ENDPOINT = '/api/periods';
+    
+    let successCount = 0;
+    let errorCount = 0;
+
+    function log(message, type = 'info') {
+      const results = document.getElementById('results');
+      const div = document.createElement('div');
+      div.className = `log ${type}`;
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      results.appendChild(div);
+      results.scrollTop = results.scrollHeight;
+    }
+
+    function updateStats(headers) {
+      document.getElementById('limit').textContent = headers.get('ratelimit-limit') || '-';
+      document.getElementById('remaining').textContent = headers.get('ratelimit-remaining') || '-';
+      
+      const reset = headers.get('ratelimit-reset');
+      if (reset) {
+        const resetDate = new Date(reset * 1000);
+        document.getElementById('reset').textContent = resetDate.toLocaleString();
+      }
+    }
+
+    async function testSingleRequest() {
+      log('Making single request...', 'info');
+      
+      try {
+        const response = await fetch(`${API_BASE}${ENDPOINT}`);
+        updateStats(response.headers);
+        
+        if (response.ok) {
+          log(`✓ Success (${response.status}) - Remaining: ${response.headers.get('ratelimit-remaining')}`, 'success');
+          successCount++;
+        } else if (response.status === 429) {
+          const data = await response.json();
+          log(`✗ Rate limited (429) - ${data.error}`, 'error');
+          errorCount++;
+        }
+      } catch (error) {
+        log(`✗ Error: ${error.message}`, 'error');
+      }
+    }
+
+    async function testMultipleRequests(count) {
+      log(`Starting test: ${count} requests...`, 'info');
+      successCount = 0;
+      errorCount = 0;
+      
+      const promises = [];
+      for (let i = 1; i <= count; i++) {
+        promises.push(
+          fetch(`${API_BASE}${ENDPOINT}`)
+            .then(response => {
+              updateStats(response.headers);
+              return {
+                num: i,
+                status: response.status,
+                remaining: response.headers.get('ratelimit-remaining')
+              };
+            })
+        );
+      }
+
+      const results = await Promise.all(promises);
+      
+      results.forEach(result => {
+        if (result.status === 200) {
+          successCount++;
+          if (successCount <= 5 || successCount >= count - 2) {
+            log(`Request ${result.num}: ✓ Success (Remaining: ${result.remaining})`, 'success');
+          } else if (successCount === 6) {
+            log('... (showing only first 5 and last few)', 'info');
+          }
+        } else if (result.status === 429) {
+          errorCount++;
+          log(`Request ${result.num}: ✗ Rate limited`, 'error');
+        }
+      });
+
+      log(`Test complete: ${successCount} successful, ${errorCount} blocked`, 'info');
+    }
+
+    function clearResults() {
+      document.getElementById('results').innerHTML = '';
+      successCount = 0;
+      errorCount = 0;
+    }
+
+    // Test on load
+    window.onload = () => {
+      log('Page loaded. Click buttons to test rate limiter.', 'info');
+      testSingleRequest();
+    };
+  </script>
+</body>
+</html>

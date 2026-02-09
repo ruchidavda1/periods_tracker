@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+# Keep only .env.example files in git
+backend/.env
+backend/.env.local
+backend/.env.*.local
+backend/.env.production
+
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/.env.production.local
+
+
+# Build outputs
+dist/
+build/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.sqlite
+
+# TypeScript
+*.tsbuildinfo
+
+# Vercel
+.vercel
+.vercel/

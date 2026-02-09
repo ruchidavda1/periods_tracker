@@ -1,0 +1,9 @@
+# Vercel
+.vercel
+.vercel/
+
+# Backend (not deployed to Vercel)
+backend/
+
+# Environment variables
+.env.production.local
