@@ -4,7 +4,6 @@ const API_BASE_URL = import.meta.env?.VITE_BACKEND_API_URL
   ? `${import.meta.env.VITE_BACKEND_API_URL}/api`
   : 'http://localhost:3000/api';
 
-// Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -12,7 +11,6 @@ const api = axios.create({
   },
 });
 
-// Add token to requests if available
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -21,7 +19,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Auth API
 export const authAPI = {
   login: async (email: string, password: string) => {
     const response = await api.post('/auth/login', { email, password });
@@ -34,7 +31,6 @@ export const authAPI = {
   },
 };
 
-// Period API
 export interface Period {
   id: string;
   start_date: string;
@@ -76,22 +72,14 @@ export const periodAPI = {
   },
 };
 
-// Prediction API - Unified Interface
 export interface Prediction {
-  // Cycle identification (only in calendar view)
   cycle_number?: number;
-  
-  // Period prediction
   predicted_start_date: string;
   predicted_end_date: string;
   confidence_score: number;
   predicted_flow_intensity: 'light' | 'moderate' | 'heavy' | null;
-  
-  // Ovulation prediction
   ovulation_start: string;
   ovulation_end: string;
-  
-  // Statistics (only in single prediction view)
   cycle_stats?: {
     avg_cycle_length: number;
     avg_period_length: number;
@@ -108,9 +96,7 @@ export const predictionAPI = {
     const response = await api.get('/predictions/next-period');
     const data = response.data.data;
     
-    // Check if data is in the nested format (legacy backend response)
     if (data && data.next_period) {
-      // Transform nested backend format to flat unified format
       return {
         predicted_start_date: data.next_period.predicted_start_date,
         predicted_end_date: data.next_period.predicted_end_date,
@@ -131,7 +117,6 @@ export const predictionAPI = {
   },
 };
 
-// Symptom API
 export type SymptomType = 'cramps' | 'headache' | 'mood_swings' | 'fatigue' | 'bloating' | 'acne' | 'other';
 
 export interface Symptom {

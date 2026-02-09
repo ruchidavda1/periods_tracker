@@ -8,7 +8,6 @@ const router = Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key';
 
-// Validation schemas
 const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),

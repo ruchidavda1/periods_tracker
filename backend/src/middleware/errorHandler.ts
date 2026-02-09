@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 
-// Custom error class for application errors
 export class AppError extends Error {
   constructor(
     public statusCode: number,
@@ -13,7 +12,6 @@ export class AppError extends Error {
   }
 }
 
-// Global error handling middleware
 export const errorHandler = (
   err: Error | AppError | ZodError,
   req: Request,
@@ -28,7 +26,6 @@ export const errorHandler = (
     timestamp: new Date().toISOString(),
   });
 
-  // Zod validation errors
   if (err instanceof ZodError) {
     return res.status(400).json({
       success: false,
@@ -40,7 +37,6 @@ export const errorHandler = (
     });
   }
 
-  // Application errors
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
       success: false,
@@ -48,7 +44,6 @@ export const errorHandler = (
     });
   }
 
-  // Sequelize/Database errors
   if (err.name === 'SequelizeValidationError') {
     return res.status(400).json({
       success: false,
@@ -74,7 +69,6 @@ export const errorHandler = (
     });
   }
 
-  // JWT errors
   if (err.name === 'JsonWebTokenError') {
     return res.status(401).json({
       success: false,
@@ -89,7 +83,6 @@ export const errorHandler = (
     });
   }
 
-  // Default to 500 server error
   return res.status(500).json({
     success: false,
     error: process.env.NODE_ENV === 'production' 
@@ -99,14 +92,12 @@ export const errorHandler = (
   });
 };
 
-// Async handler wrapper to catch errors in async route handlers
 export const asyncHandler = (fn: Function) => {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 };
 
-// Not found handler
 export const notFoundHandler = (req: Request, res: Response) => {
   res.status(404).json({
     success: false,
