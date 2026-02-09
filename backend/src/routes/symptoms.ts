@@ -6,12 +6,10 @@ import { authMiddleware } from '../middleware/auth';
 const router = Router();
 router.use(authMiddleware);
 
-// GET /api/symptoms/patterns - Get user's symptom patterns
 router.get('/patterns', async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
 
-    // Get all user's periods with symptoms
     const periods = await Period.findAll({
       where: { user_id: userId },
       include: [{
@@ -21,7 +19,6 @@ router.get('/patterns', async (req: Request, res: Response) => {
       order: [['start_date', 'DESC']],
     });
 
-    // Analyze symptom patterns
     const symptomStats: { [key: string]: { count: number; totalSeverity: number; avgSeverity: number; frequency: number } } = {};
     let totalPeriods = periods.length;
 
@@ -37,17 +34,15 @@ router.get('/patterns', async (req: Request, res: Response) => {
       });
     });
 
-    // Calculate averages and frequencies
     Object.keys(symptomStats).forEach(type => {
       symptomStats[type].avgSeverity = symptomStats[type].totalSeverity / symptomStats[type].count;
       symptomStats[type].frequency = symptomStats[type].count / totalPeriods;
     });
 
-    // Sort by frequency
     const patterns = Object.entries(symptomStats)
       .map(([type, stats]) => ({
         symptom_type: type,
-        frequency: Math.round(stats.frequency * 100), // Percentage
+        frequency: Math.round(stats.frequency * 100),
         avg_severity: Math.round(stats.avgSeverity * 10) / 10, // 1 decimal
         occurrences: stats.count,
       }))

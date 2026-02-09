@@ -18,15 +18,10 @@ const loginSchema = z.object({
   password: z.string(),
 });
 
-/**
- * POST /api/auth/register
- * Register a new user
- */
 router.post('/register', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = registerSchema.parse(req.body);
     
-    // Check if user already exists
     const existingUser = await User.findOne({
       where: { email },
     });
@@ -39,16 +34,13 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
       return;
     }
     
-    // Hash password
     const password_hash = await bcrypt.hash(password, 10);
     
-    // Create user
     const user = await User.create({
       email,
       password_hash,
     });
     
-    // Create default user settings
     await UserSettings.create({
       user_id: user.id,
       avg_cycle_length: 28,
@@ -56,7 +48,6 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
       notifications_enabled: true,
     });
     
-    // Generate JWT token
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
     
     res.status(201).json({
@@ -83,15 +74,10 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
   }
 });
 
-/**
- * POST /api/auth/login
- * Login user
- */
 router.post('/login', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = loginSchema.parse(req.body);
     
-    // Find user
     const user = await User.findOne({
       where: { email },
     });
@@ -104,7 +90,6 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
       return;
     }
     
-    // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
     
     if (!isPasswordValid) {
@@ -115,7 +100,6 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
       return;
     }
     
-    // Generate JWT token
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
     
     res.json({

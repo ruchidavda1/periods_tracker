@@ -42,7 +42,6 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
       notes: validatedData.notes,
     });
     
-    // Invalidate prediction cache when new period is added
     await cacheHelpers.delete(`prediction:${userId}`);
     
     res.status(201).json({

@@ -22,7 +22,6 @@ function App() {
   const [showCalendar, setShowCalendar] = useState(false);
 
   useEffect(() => {
-    // Check if user is already logged in
     const token = localStorage.getItem('token');
     if (token) {
       setIsAuthenticated(true);
@@ -100,16 +99,13 @@ function App() {
       let periodId: string;
       
       if (editingPeriod) {
-        // Update existing period
         await periodAPI.update(editingPeriod.id, data);
         periodId = editingPeriod.id;
       } else {
-        // Create new period
         const result = await periodAPI.create(data);
         periodId = result.data.id;
       }
-
-      // Add symptoms if any (now with proper dates)
+      
       if (data.symptoms && data.symptoms.length > 0 && periodId) {
         await Promise.all(
           data.symptoms.map(symptom =>

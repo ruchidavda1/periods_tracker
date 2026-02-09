@@ -2,7 +2,6 @@ import Redis from 'ioredis';
 
 const REDIS_URL = process.env.REDIS_URL;
 
-// Create Redis client (optional - only if REDIS_URL is provided)
 let redis: Redis | null = null;
 
 if (REDIS_URL) {
@@ -21,9 +20,7 @@ if (REDIS_URL) {
 
 export const redisClient = redis;
 
-// Cache helper functions
 export const cacheHelpers = {
-  // Get cached data
   async get<T>(key: string): Promise<T | null> {
     if (!redis) return null;
     
@@ -36,7 +33,6 @@ export const cacheHelpers = {
     }
   },
 
-  // Set cached data with TTL (time to live in seconds)
   async set(key: string, value: any, ttl: number = 3600): Promise<void> {
     if (!redis) return;
     
@@ -47,7 +43,6 @@ export const cacheHelpers = {
     }
   },
 
-  // Invalidate cache
   async delete(pattern: string): Promise<void> {
     if (!redis) return;
     
@@ -61,7 +56,6 @@ export const cacheHelpers = {
     }
   },
 
-  // Check if Redis is available
   isAvailable(): boolean {
     return redis !== null && redis.status === 'ready';
   }
