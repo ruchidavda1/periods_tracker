@@ -95,6 +95,11 @@ jobs:
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     
     steps:
+      - name: Trigger Vercel Deployment
+        run: |
+          curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
+          echo "Vercel deployment triggered via webhook"
+      
       - name: Trigger Render Deployment
         run: |
           curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
@@ -105,7 +110,7 @@ jobs:
           echo "All CI checks passed!"
           echo ""
           echo "Automatic deployments:"
-          echo "  - Frontend: Vercel will auto-deploy from master branch"
+          echo "  - Frontend: Vercel deployment triggered via webhook"
           echo "  - Backend: Render deployment triggered via webhook"
           echo ""
           echo "Live URLs:"
