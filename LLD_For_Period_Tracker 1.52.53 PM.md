@@ -348,4 +348,3 @@ Notes:
 
 - Confidence decreases by ~5% per future cycle
 - Uses same cycle stats for all predictions
-- Not cached (relatively fast query)
