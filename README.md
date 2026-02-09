@@ -256,16 +256,6 @@ period_tracker/
 └── README.md
 ```
 
-## Future Ideas
-
-- ML model for better predictions (LSTM - Long Short-Term Memory networks)
-- Symptom pattern analysis
-- Notifications/reminders
-- Export data as CSV/PDF
-- More detailed analytics
-- Mobile app (React Native)
-- Smart notifications based on user's cycle patterns
-
 ## Known Limitations
 
 - Needs at least 3 cycles for statistical predictions (uses defaults before that)

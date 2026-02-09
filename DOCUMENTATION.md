@@ -301,14 +301,15 @@ One annoying thing about free tier hosting - backend goes to sleep after 15 minu
 
 If we were rebuilding this:
 
-- Try ML models for users with lots of data(LSTM)
+- Try ML models for users with lots of data (LSTM - Long Short-Term Memory networks for time series)
 - Detect anomalies (missed periods, sudden pattern changes)
 - Analyze symptom correlations
 - Smart notifications based on user's cycle patterns
 - More detailed analytics
 - External factors analysis (weather, stress,diet, sleep,exercise, etc.)
 - Integrate with other health apps (Google Fit, Apple Health, etc.) & devices (smartwatches, fitness trackers, rings, etc.)
-
+- Add a chatbot for user support and feedback.
+- Export data as CSV/PDF
 
 **Performance:**
 - Pagination from the start
