@@ -133,35 +133,35 @@ Period (1) --> (many) Symptom
 
 ### Example Calculation
 
-User stats (My period history):
+User stats (My actual period history):
 
-- Number of periods tracked: 8 i.e. the user has tracked 8 periods
-- Cycle Lengths: [28, 27, 27, 29, 28, 26, 28, 29]
-- weighted moving average: 27.625 days (recent 3 cycles *0.5 + middle 3 cycles* 0.3 + older cycles * 0.2)
-  - recent 3 cycles: [28, 27, 27] -> 27.33
-  - middle 3 cycles: [29, 28, 26] -> 27.67
-  - older cycles: [28, 29] -> 28.5
-  - weighted moving average: 27.625 days (recent 3 cycles *0.5 + middle 3 cycles* 0.3 + older cycles * 0.2)
-- Standard Deviation: 2.0 days
+- Number of periods tracked: 10 i.e. the user has tracked 10 periods
+- Cycle Lengths: [22, 25, 24, 26, 22, 27, 21, 25, 22, 35]
+- weighted moving average: 24.49 days (recent 3 cycles *0.5 + middle 3 cycles* 0.3 + older cycles * 0.2)
+  - recent 3 cycles: [22, 25, 24] -> 23.67
+  - middle 3 cycles: [26, 22, 27] -> 25.0
+  - older 4 cycles: [21, 25, 22, 35] -> 25.75
+  - weighted moving average: 23.67 * 0.5 + 25.0 * 0.3 + 25.75 * 0.2 = 24.49 days
+- Standard Deviation: 3.86 days
   - formula: √(Σ(xi - μ)² / n)
-        - Mean: (28 + 27 + 27 + 29 + 28 + 26 + 28 + 29) / 8 = 27.625
-        - Deviations: [0.625, -0.625, -0.625, 1.375, 0.375, -1.625, 0.375, 1.375]
-        - Squared deviations: [0.390625, 0.390625, 0.390625, 1.890625, 0.140625, 2.640625, 0.140625, 1.890625]
-        - Sum of squared deviations: 8.453125
-        - Standard Deviation: √(8.453125 / 8) = 2.0 days i.e falls in "Regular" category
+        - Mean: (22 + 25 + 24 + 26 + 22 + 27 + 21 + 25 + 22 + 35) / 10 = 24.9
+        - Deviations: [-2.9, 0.1, -0.9, 1.1, -2.9, 2.1, -3.9, 0.1, -2.9, 10.1]
+        - Squared deviations: [8.41, 0.01, 0.81, 1.21, 8.41, 4.41, 15.21, 0.01, 8.41, 102.01]
+        - Sum of squared deviations: 148.9
+        - Standard Deviation: √(148.9 / 10) = 3.86 days i.e falls in "Regular" category (2-4 days)
 - Confidence Score Calculation:
-  - Base Confidence: 0.82 (SD = 2.0, falls in "Regular" category)
-    - Data Boost: (8/12) * 0.08 = 0.053
-    - Cycle Adjustment: -0.05  (24 days is outside typical 26-32 range)
-    - Final Confidence: 0.82 + 0.053 - 0.05 = 0.823 = 82.3% confidence score
+  - Base Confidence: 0.82 (SD = 3.86, falls in "Regular" category)
+    - Data Boost: (10/12) * 0.08 = 0.067
+    - Cycle Adjustment: -0.05  (24.49 days is outside typical 26-32 range)
+    - Final Confidence: 0.82 + 0.067 - 0.05 = 0.837 = 83.7% confidence score
 - Next Period Prediction:
-  - Last period start date: 2026-02-01 i.e. the last period in the user's period history
-    - Next period start date: 2026-02-01 + 27.625 days = 2026-02-28
-    - Next period end date: 2026-02-28 + 5 days = 2026-03-05
+  - Last period start date: 2026-02-12 i.e. the most recent period in the user's period history
+    - Next period start date: 2026-02-12 + 24.49 days (rounded to 25) = 2026-03-09
+    - Next period end date: 2026-03-09 + 2 days = 2026-03-11
 - Ovulation Prediction:
-  - Ovulation day: 2026-02-28 - 14 days = 2026-02-14
-    - Fertile window start date: 2026-02-14 - 5 days = 2026-02-09
-    - Fertile window end date: 2026-02-14 + 1 day = 2026-02-15
+  - Ovulation day: 2026-03-09 - 14 days = 2026-02-23
+    - Fertile window start date: 2026-02-23 - 5 days = 2026-02-18
+    - Fertile window end date: 2026-02-23 + 1 day = 2026-02-24
 
 ### Flow Intensity Prediction
 
@@ -280,11 +280,11 @@ Response (200):
       "predicted_end_date": "2026-02-01"
     },
     "cycle_stats": {
-      "avg_cycle_length": 24,
+      "avg_cycle_length": 24.9,
       "avg_period_length": 2,
       "cycle_regularity": "regular",
-      "cycle_variation": "2.00",
-      "cycles_tracked": 8
+      "cycle_variation": "3.86",
+      "cycles_tracked": 10
     }
   },
   "cached": false
@@ -334,11 +334,11 @@ Response (200):
       }
     ],
     "cycle_stats": {
-      "avg_cycle_length": 24,
+      "avg_cycle_length": 24.9,
       "avg_period_length": 2,
       "cycle_regularity": "regular",
-      "cycle_variation": "2.00",
-      "cycles_tracked": 8
+      "cycle_variation": "3.86",
+      "cycles_tracked": 10
     }
   }
 }
